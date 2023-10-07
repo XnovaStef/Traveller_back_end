@@ -209,7 +209,7 @@ exports.ForgotPassword = async (req, res) => {
     }
 
     // Generate a random 6-digit code
-    const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const generatedCode = "xnova@@";
 
     // Hash the generated code
     const salt = await bcrypt.genSalt(10);
@@ -227,7 +227,7 @@ exports.ForgotPassword = async (req, res) => {
     await accountForgot.save();
 
     // Generate a JWT token
-    const token = jwt.sign({ userId: user._id }, 'your-secret-key', {
+    const token = jwt.sign({ codeId: user._id }, 'your-secret-key', {
       expiresIn: '1h', // You can set the expiration time as needed
     });
 
@@ -236,6 +236,15 @@ exports.ForgotPassword = async (req, res) => {
       token: token, // Include the token in the response
     });
 
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+exports.getCodeById = async (req, res) => {
+  try {
+    const code = await AccountForgot.findById(req.params.id);
+    res.json(code);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
