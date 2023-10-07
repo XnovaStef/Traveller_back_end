@@ -11,6 +11,7 @@ const modifyCompanyEmail = require('../xnova_back_end/routes/CompanyRoutes')
 const modifyCompanyPassword = require('../xnova_back_end/routes/CompanyRoutes')
 const makeDeletionRequest = require('../xnova_back_end/routes/UserRoute')
 const companyDeletionRequest = require('../xnova_back_end/routes/CompanyRoutes')
+const ForgotPassword  = require('../xnova_back_end/routes/UserRoute')
 
 
 const app = express();
@@ -39,7 +40,7 @@ app.use('/api',modifyCompanyEmail);
 app.use('/api', modifyCompanyPassword);
 app.use('/api',  makeDeletionRequest);
 app.use('/api', companyDeletionRequest);
-
+app.use('/api', ForgotPassword );
 
 // Start the Express server
 const PORT = process.env.PORT || 3000;

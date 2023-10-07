@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/UserModels'); // Assuming this is the correct path to your User model
 const RequestDeleteUser = require('../models/RequestModels')
+const AccountForgot = require('../models/ForgotModels')
 
 // Define a route for user registration
 exports.UserModels = async (req, res) => {
@@ -199,5 +200,45 @@ exports.makeDeletionRequest = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+exports.ForgotPassword = async (req, res) => {
+  try {
+    // Check if the user with the provided phone number exists
+    const user = await User.findOne({ tel: req.body.tel });
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+    }
+
+    // Generate a random 6-digit code
+    const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Hash the generated code
+    const salt = await bcrypt.genSalt(10);
+    const hashedCode = await bcrypt.hash(generatedCode, salt);
+
+    // Update the user's password with the hashed code
+    user.password = hashedCode;
+    await user.save();
+
+    // Record the generated code in the AccountForgot table
+    const accountForgot = new AccountForgot({
+      tel: req.body.tel,
+      code: generatedCode, // Save the generated code in the AccountForgot table
+    });
+    await accountForgot.save();
+
+    // Generate a JWT token
+    const token = jwt.sign({ userId: user._id }, 'your-secret-key', {
+      expiresIn: '1h', // You can set the expiration time as needed
+    });
+
+    res.status(200).json({
+      message: 'Code généré et mot de passe utilisateur mis à jour avec succès.',
+      token: token, // Include the token in the response
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
 
 
