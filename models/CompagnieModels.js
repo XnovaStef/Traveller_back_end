@@ -38,6 +38,10 @@ const CompanySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  heure_départ: {
+    type: String,
+    required: true,
+  },
   dateAdded: {
     type: Date,
     default: Date.now,

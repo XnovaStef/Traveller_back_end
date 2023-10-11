@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/UserModels'); // Assuming this is the correct path to your User model
 const RequestDeleteUser = require('../models/RequestModels')
 const AccountForgot = require('../models/ForgotModels')
+const ColisPay = require('../models/PayColisModels')
+const Reservation = require('../models/ReservModels')
+const crypto = require('crypto');
 
 // Define a route for user registration
 exports.UserModels = async (req, res) => {
@@ -249,5 +252,123 @@ exports.getCodeById = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 }
+exports.PaymentTravel = async (req, res) => {
+  try {
+    // Récupérez les informations du paiement à partir de la requête
+    const { nombre_place, heure_depart, compagnie, destination, montant, gare } = req.body;
+
+    // Générez un code alphanumérique aléatoire
+    const codeAlphanum = crypto.randomBytes(6).toString('hex'); // Vous pouvez ajuster la longueur du code en modifiant le nombre d'octets
+
+    // Créez une nouvelle instance de UserPay avec les informations fournies
+    const nouveauPaiement = new TravelPay({
+      nombre_place,
+      heure_depart,
+      compagnie,
+      destination,
+      montant,
+      gare,
+      code_ticket: codeAlphanum, // Utilisation du code généré
+    });
+
+    // Enregistrez le paiement dans la base de données
+    const paiementEnregistre = await nouveauPaiement.save();
+
+    // Retournez les détails du paiement enregistré
+    res.status(200).json({
+      message: 'Paiement enregistré avec succès.',
+      payment: paiementEnregistre,
+    });
+  } catch (error) {
+    // Gérez les erreurs appropriées ici
+    res.status(500).json({ message: error.message });
+  }
+}
+
+exports.PaymentColis = async (req, res) => {
+  try {
+    // Récupérez les informations du paiement à partir de la requête
+    const { valeur_colis, Tarif, compagnie, destination, gare } = req.body;
+
+    // Générez un code alphanumérique aléatoire
+    const codeAlphanum = crypto.randomBytes(6).toString('hex'); // Vous pouvez ajuster la longueur du code en modifiant le nombre d'octets
+
+    // Créez une nouvelle instance de UserPay avec les informations fournies
+    const nouveauPaiement = new ColisPay({
+      valeur_colis,
+      Tarif,
+      compagnie,
+      destination,
+      gare,
+      code_ticket: codeAlphanum, // Utilisation du code généré
+    });
+
+    // Enregistrez le paiement dans la base de données
+    const paiementEnregistre = await nouveauPaiement.save();
+
+    // Retournez les détails du paiement enregistré
+    res.status(200).json({
+      message: 'Paiement enregistré avec succès.',
+      payment: paiementEnregistre,
+    });
+  } catch (error) {
+    // Gérez les erreurs appropriées ici
+    res.status(500).json({ message: error.message });
+  }
+}
+
+exports.Reservation = async (req, res) => {
+  try {
+    // Récupérez les informations de la réservation à partir de la requête
+    const { nombre_place, heure_depart, compagnie, destination, gare } = req.body;
+
+    // Créez une date avec l'heure et les minutes spécifiées et le fuseau horaire de la Côte d'Ivoire (UTC+0)
+    const heureDepartParts = heure_depart.split(':');
+    if (heureDepartParts.length !== 2) {
+      return res.status(400).json({ message: 'Format d\'heure de départ invalide. Utilisez hh:mm.' });
+    }
+    const hours = parseInt(heureDepartParts[0], 10);
+    const minutes = parseInt(heureDepartParts[1], 10);
+
+    if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours >= 24 || minutes < 0 || minutes >= 60) {
+      return res.status(400).json({ message: 'Heure de départ invalide.' });
+    }
+
+    // Créez une nouvelle date avec l'heure et les minutes spécifiées et le fuseau horaire de la Côte d'Ivoire (UTC+0)
+    const heure_depart_date = new Date();
+    heure_depart_date.setUTCHours(hours);
+    heure_depart_date.setUTCMinutes(minutes);
+
+    // Calculez la valeur de heure_validation en ajoutant 24 heures à heure_depart_date
+    const heure_validation = new Date(heure_depart_date);
+    heure_validation.setUTCHours(heure_validation.getUTCHours() + 24);
+
+    // Créez une nouvelle instance de Reservation avec les informations fournies
+    const newReservation = new Reservation({
+      nombre_place,
+      heure_depart: heure_depart_date,
+      heure_validation,
+      compagnie,
+      destination,
+      gare,
+    });
+
+    // Enregistrez la réservation dans la base de données
+    const reservationEnregistree = await newReservation.save();
+
+    // Retournez les détails de la réservation enregistrée
+    res.status(200).json({
+      message: 'Réservation enregistrée avec succès.',
+      reservation: reservationEnregistree,
+    });
+  } catch (error) {
+    // Gérez les erreurs appropriées ici
+    res.status(500).json({ message: error.message });
+  }
+}
+
+
+
+
 
 

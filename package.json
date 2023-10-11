@@ -2,17 +2,18 @@
   "name": "xnova_back_end",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",  
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Fallet kamagate",  
+  "author": "Fallet kamagate",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "mailgen": "^2.0.27",
+    "moment-timezone": "^0.5.43",
     "mongoose": "^7.5.0",
     "mongoose-unique-validator": "^4.0.0",
     "multer": "^1.4.5-lts.1",
@@ -21,11 +22,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/Ramses-F/xnova_back_end.git"  
+    "url": "git+ssh://git@github.com/Ramses-F/xnova_back_end.git"
   },
-  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Ramses-F/xnova_back_end/issues"  
+    "url": "https://github.com/Ramses-F/xnova_back_end/issues"
   },
-  "homepage": "https://github.com/Ramses-F/xnova_back_end#readme"  
+  "homepage": "https://github.com/Ramses-F/xnova_back_end#readme"
 }

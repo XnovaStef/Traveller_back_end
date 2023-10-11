@@ -11,7 +11,10 @@ const modifyCompanyEmail = require('../xnova_back_end/routes/CompanyRoutes')
 const modifyCompanyPassword = require('../xnova_back_end/routes/CompanyRoutes')
 const makeDeletionRequest = require('../xnova_back_end/routes/UserRoute')
 const companyDeletionRequest = require('../xnova_back_end/routes/CompanyRoutes')
-const ForgotPassword  = require('../xnova_back_end/routes/UserRoute')
+const ForgotPassword  = require('../xnova_back_end/routes/UserRoute');
+const PaymentTravel = require('../xnova_back_end/routes/UserRoute')
+const PaymentColis = require('../xnova_back_end/routes/UserRoute')
+const Reservation = require('../xnova_back_end/routes/UserRoute')
 
 
 const app = express();
@@ -41,6 +44,9 @@ app.use('/api', modifyCompanyPassword);
 app.use('/api',  makeDeletionRequest);
 app.use('/api', companyDeletionRequest);
 app.use('/api', ForgotPassword );
+app.use('/api', PaymentTravel );
+app.use('/api', PaymentColis );
+app.use('/api', Reservation );
 
 // Start the Express server
 const PORT = process.env.PORT || 3000;
