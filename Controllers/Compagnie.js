@@ -53,8 +53,9 @@ exports.registerCompany = async (req, res) => {
         tarifTravel,
         gareTravel,
         destinationColis,
-        tarifColis,
+        TarifColis,
         gareColis,
+        depart,
       } = req.body;
 
       // Check if a company with the same email already exists
@@ -101,8 +102,9 @@ exports.registerCompany = async (req, res) => {
           tarifTravel,
           gareTravel,
           destinationColis,
-          tarifColis,
+          TarifColis,
           gareColis,
+         depart,
           logo: {
             data: fs.readFileSync(path.join(__dirname, "../uploads/" + req.file.filename)),
             contentType: req.file.mimetype,

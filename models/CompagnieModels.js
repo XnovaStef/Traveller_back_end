@@ -30,7 +30,7 @@ const CompanySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  tarifColis: {
+  TarifColis: {
     type: String,
     required: true,
   },
@@ -38,8 +38,8 @@ const CompanySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  heure_départ: {
-    type: String,
+  depart: {
+    type: String, 
     required: true,
   },
   dateAdded: {
