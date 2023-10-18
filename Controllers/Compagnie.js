@@ -7,6 +7,7 @@ const RequestDeleteCompany = require('../models/RequestCompModels')
  const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const CompForgot = require('../models/ForgotCompModels')
 
 // Define multer disk storage
 const storage = multer.diskStorage({
@@ -313,6 +314,47 @@ exports.companyDeletionRequest = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.ForgotCompanyPassword = async (req, res) => {
+  try {
+    // Check if the user with the provided phone number exists
+    const company = await Company.findOne({ email: req.body.email });
+    if (!company) {
+      return res.status(404).json({ message: 'Compagnie non trouvée.' });
+    }
+
+    // Generate a random 6-digit code
+    const generatedCode = "xnova@@";
+
+    // Hash the generated code
+    const salt = await bcrypt.genSalt(10);
+    const hashedCode = await bcrypt.hash(generatedCode, salt);
+
+    // Update the user's password with the hashed code
+    company.password = hashedCode;
+    await company.save();
+
+    // Record the generated code in the AccountForgot table
+    const compForgot = new CompForgot({
+      email: req.body.email,
+      code: generatedCode, // Save the generated code in the AccountForgot table
+    });
+    await compForgot.save();
+
+    // Generate a JWT token
+    const token = jwt.sign({ codeId: company._id }, 'your-secret-key', {
+      expiresIn: '1h', // You can set the expiration time as needed
+    });
+
+    res.status(200).json({
+      message: 'Code généré et mot de passe compagnie mis à jour avec succès.',
+      token: token, // Include the token in the response
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
 
 
 
