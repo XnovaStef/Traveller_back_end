@@ -8,6 +8,8 @@ const {
   makeDeletionRequest,
   ForgotPassword,
   getUserById,
+  createTravel,
+  loginPass
 
 } = require('../Controllers/User');
 
@@ -21,7 +23,8 @@ router.post('/users/forgot', ForgotPassword);
 router.get('/users/:id', getUserById);
 
 // Routes pour les paiements de voyage
-
+router.post('/Travel', createTravel);
+router.post('/LoginPass', loginPass);
 
 // Routes pour les paiements de colis
 

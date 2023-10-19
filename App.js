@@ -13,6 +13,8 @@ const makeDeletionRequest = require('../xnova_back_end/routes/UserRoute')
 const companyDeletionRequest = require('../xnova_back_end/routes/CompanyRoutes')
 const ForgotPassword  = require('../xnova_back_end/routes/UserRoute');
 const ForgotCompanyPassword  = require('../xnova_back_end/routes/CompanyRoutes')
+const createTravel = require('../xnova_back_end/routes/UserRoute')
+const loginPass = require('../xnova_back_end/routes/UserRoute')
 
 
 
@@ -44,6 +46,8 @@ app.use('/api',  makeDeletionRequest);
 app.use('/api', companyDeletionRequest);
 app.use('/api', ForgotPassword );
 app.use('/api/company', ForgotCompanyPassword  );
+app.use('/api/user', createTravel  );
+app.use('/api/user', loginPass  );
 
 // Start the Express server
 const PORT = process.env.PORT || 3000;

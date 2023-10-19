@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/UserModels'); // Assuming this is the correct path to your User model
 const RequestDeleteUser = require('../models/RequestModels')
 const AccountForgot = require('../models/ForgotModels')
+const Travel = require('../models/TravelModels')
+const Pass = require('../models/PassModels');
+const { now } = require('mongoose');
 //const crypto = require('crypto');
 
 
@@ -251,6 +254,87 @@ exports.getCodeById = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 }
+
+exports.createTravel = async (req, res) => {
+  try {
+    // Extract user data from the request body
+    const { tel, nombre_place, heure_depart, compagnie, destination, montant, gare } = req.body;
+
+    // Check if a user with the same phone number already exists
+    const existingUser = await User.findOne({ tel });
+
+    if (existingUser) {
+      return res.status(400).json({ message: 'Paiement non effectué, numéro de téléphone incorrect' });
+    }
+
+    // Generate a random digit code (temporary password) with an expiration time
+    const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
+    const codeExpiration = new Date();
+    codeExpiration.setMinutes(codeExpiration.getMinutes() + 1); // Code expires in 15 minutes
+
+    // Create a new user document
+    const newTravel = new Travel({
+      tel,
+      nombre_place,
+      heure_depart,
+      compagnie,
+      destination,
+      montant,
+      code: digitCode, // Store the hashed password
+      codeExpiration, // Store code expiration time
+      gare
+    });
+
+    // Save the user to the database
+    await newTravel.save();
+
+    // Create and send a JWT token for authentication
+    const token = jwt.sign({ travelId: newTravel._id }, 'your-secret-key'); // Replace with your secret key
+    res.status(201).json({ message: 'Paiement effectué', token });
+
+    // Save the code and tel in the "Pass" collection
+    const newPass = new Pass({ tel, code: digitCode, codeExpiration });
+    await newPass.save();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+exports.loginPass = async (req, res) => {
+  try {
+    // Extract the code from the request body
+    const { code } = req.body;
+
+    // Find the corresponding pass (code) in the Pass collection
+    const pass = await Pass.findOne({ code });
+
+    if (!pass) {
+      return res.status(401).json({ message: 'Code incorrect' });
+    }
+
+    // Check if the code has expired
+    const currentTimestamp = new Date();
+    if (pass.codeExpiration && currentTimestamp > new Date(pass.codeExpiration)) {
+      return res.status(401).json({ message: 'Code expiré' });
+    }
+
+    // Generate a JWT token for authentication
+    const token = jwt.sign({ passId: pass._id }, 'your-secret-key'); // Replace with your secret key
+
+    res.status(200).json({ message: 'Connexion réussie', token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+
+
+
+
 
 
 
