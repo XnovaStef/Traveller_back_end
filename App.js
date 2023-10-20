@@ -15,6 +15,8 @@ const ForgotPassword  = require('../xnova_back_end/routes/UserRoute');
 const ForgotCompanyPassword  = require('../xnova_back_end/routes/CompanyRoutes')
 const createTravel = require('../xnova_back_end/routes/UserRoute')
 const loginPass = require('../xnova_back_end/routes/UserRoute')
+const countUsers = require('../xnova_back_end/routes/UserRoute')
+const countCompany = require('../xnova_back_end/routes/CompanyRoutes')
 
 
 
@@ -34,8 +36,10 @@ mongoose
 
 // Define API routes
 app.use('/api', UserModels);
+app.use('/api', countUsers);
 app.use('/api', userLogin);
 app.use('/api',registerCompany);
+app.use('/api', countCompany);
 app.use('/api',loginCompany);
 app.use('/api',modifyUserName);
 app.use('/api',modifyUserPassword);

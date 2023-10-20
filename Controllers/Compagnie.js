@@ -129,6 +129,18 @@ exports.registerCompany = async (req, res) => {
 };
 
 
+exports.countCompany = async (req, res) => {
+  try {
+    // Utilisez la méthode `countDocuments` de Mongoose pour compter les utilisateurs dans la base de données
+    const companyCount = await Company.countDocuments();
+
+    res.status(200).json({ companyCount });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Erreur interne du serveur' });
+  }
+};
+
 
 exports.getCompanyById = async (req, res) => {
   try {

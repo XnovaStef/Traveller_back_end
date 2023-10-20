@@ -47,6 +47,17 @@ exports.UserModels = async (req, res) => {
   }
 };
 
+exports.countUsers = async (req,res)=>{
+  try{
+      const user = await User.find(); // récupérer tous les utilisateurs
+      const userCount = user.length
+      res.json({countUser : userCount });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+ 
+}
+
 exports.userLogin = async (req, res) => {
   try {
     // Extract user data from the request body

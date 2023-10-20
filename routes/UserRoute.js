@@ -9,7 +9,8 @@ const {
   ForgotPassword,
   getUserById,
   createTravel,
-  loginPass
+  loginPass,
+  countUsers
 
 } = require('../Controllers/User');
 
@@ -21,6 +22,7 @@ router.put('/users/:id/updatePassword', modifyUserPassword);
 router.post('/users/RequestUser', makeDeletionRequest);
 router.post('/users/forgot', ForgotPassword);
 router.get('/users/:id', getUserById);
+router.get('/countUsers', countUsers);
 
 // Routes pour les paiements de voyage
 router.post('/Travel', createTravel);
