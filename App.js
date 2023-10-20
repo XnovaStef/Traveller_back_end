@@ -17,10 +17,14 @@ const createTravel = require('../xnova_back_end/routes/UserRoute')
 const loginPass = require('../xnova_back_end/routes/UserRoute')
 const countUsers = require('../xnova_back_end/routes/UserRoute')
 const countCompany = require('../xnova_back_end/routes/CompanyRoutes')
+const cors = require('cors'); 
 
 
 
 const app = express();
+
+// Enable CORS for all routes
+app.use(cors());
 
 // Configure Express to parse JSON request bodies
 app.use(express.json());
