@@ -10,7 +10,8 @@ const {
   getUserById,
   createTravel,
   loginPass,
-  countUsers
+  countUsers,
+  Reservation 
 
 } = require('../Controllers/User');
 
@@ -32,6 +33,6 @@ router.post('/LoginPass', loginPass);
 
 
 // Routes pour les réservations
-
+router.post('/reservation', Reservation);
 
 module.exports = router;

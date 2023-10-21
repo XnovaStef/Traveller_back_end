@@ -7,6 +7,7 @@ const AccountForgot = require('../models/ForgotModels')
 const Travel = require('../models/TravelModels')
 const Pass = require('../models/PassModels');
 const { now } = require('mongoose');
+const Reservation = require('../models/ReservModels')
 //const crypto = require('crypto');
 
 
@@ -281,7 +282,7 @@ exports.createTravel = async (req, res) => {
     // Generate a random digit code (temporary password) with an expiration time
     const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
     const codeExpiration = new Date();
-    codeExpiration.setMinutes(codeExpiration.getMinutes() + 1); // Code expires in 15 minutes
+    codeExpiration.setMinutes(codeExpiration.getMinutes() + 6); // Code expires in 15 minutes
 
     // Create a new user document
     const newTravel = new Travel({
@@ -300,7 +301,7 @@ exports.createTravel = async (req, res) => {
     await newTravel.save();
 
     // Create and send a JWT token for authentication
-    const token = jwt.sign({ travelId: newTravel._id }, 'your-secret-key'); // Replace with your secret key
+    const token = jwt.sign({ codeId: newTravel._id }, 'your-secret-key'); // Replace with your secret key
     res.status(201).json({ message: 'Paiement effectué', token });
 
     // Save the code and tel in the "Pass" collection
@@ -355,10 +356,16 @@ exports.loginPass = async (req, res) => {
 
 
 
-/*exports.Reservation = async (req, res) => {
+exports.Reservation = async (req, res) => {
   try {
     // Récupérez les informations de la réservation à partir de la requête
-    const { nombre_place, heure_depart, compagnie, destination, gare } = req.body;
+    const { tel, nombre_place, heure_depart, compagnie, destination, gare } = req.body;
+
+    const existingUser = await User.findOne({ tel });
+
+    if (existingUser) {
+      return res.status(400).json({ message: 'Paiement non effectué, numéro de téléphone incorrect' });
+    }
 
     // Créez une date avec l'heure et les minutes spécifiées et le fuseau horaire de la Côte d'Ivoire (UTC+0)
     const heureDepartParts = heure_depart.split(':');
@@ -367,7 +374,7 @@ exports.loginPass = async (req, res) => {
     }
     const hours = parseInt(heureDepartParts[0], 10);
     const minutes = parseInt(heureDepartParts[1], 10);
-
+    
     if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours >= 24 || minutes < 0 || minutes >= 60) {
       return res.status(400).json({ message: 'Heure de départ invalide.' });
     }
@@ -377,16 +384,25 @@ exports.loginPass = async (req, res) => {
     heure_depart_date.setUTCHours(hours);
     heure_depart_date.setUTCMinutes(minutes);
 
-    // Calculez la valeur de heure_validation en ajoutant 24 heures à heure_depart_date
-    const heure_validation = new Date(heure_depart_date);
-    heure_validation.setUTCHours(heure_validation.getUTCHours() + 24);
+    // Calculez la valeur de heure_validation en ajoutant 24 heures à dateReserv
+    const dateReserv = new Date(); // Obtenez la date et l'heure actuelles
+    const heure_validation = new Date(dateReserv);
+    heure_validation.setUTCDate(heure_validation.getUTCDate() + 1); // Ajoute 24 heures
+
+      // Generate a random digit code (temporary password) with an expiration time
+      const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
+      const codeExpiration = new Date();
+      codeExpiration.setMinutes(codeExpiration.getMinutes() + 1); // Code expires in 15 minutes
 
     // Créez une nouvelle instance de Reservation avec les informations fournies
     const newReservation = new Reservation({
+      tel,
       nombre_place,
       heure_depart: heure_depart_date,
       heure_validation,
       compagnie,
+      code: digitCode, // Store the hashed password
+      codeExpiration, // Store code expiration time
       destination,
       gare,
     });
@@ -394,16 +410,24 @@ exports.loginPass = async (req, res) => {
     // Enregistrez la réservation dans la base de données
     const reservationEnregistree = await newReservation.save();
 
-    // Retournez les détails de la réservation enregistrée
-    res.status(200).json({
-      message: 'Réservation enregistrée avec succès.',
-      reservation: reservationEnregistree,
-    });
+    
+    // Save the code and tel in the "Pass" collection
+    const newPass = new Pass({ tel, code: digitCode, codeExpiration });
+    await newPass.save();
+
+     // Create and send a JWT token for authentication
+     const token = jwt.sign({ codeId: newReservation._id }, 'your-secret-key'); // Replace with your secret key
+     res.status(201).json({ message:  `Réservation enregistrée avec succès, veuillez vous présenter avant ${heure_validation.toISOString()}`, token });
+
+
+
+    
   } catch (error) {
     // Gérez les erreurs appropriées ici
     res.status(500).json({ message: error.message });
   }
-}*/
+}
+
 
 
 

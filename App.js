@@ -17,6 +17,7 @@ const createTravel = require('../xnova_back_end/routes/UserRoute')
 const loginPass = require('../xnova_back_end/routes/UserRoute')
 const countUsers = require('../xnova_back_end/routes/UserRoute')
 const countCompany = require('../xnova_back_end/routes/CompanyRoutes')
+const Reservation = require('../xnova_back_end/routes/UserRoute')
 const cors = require('cors'); 
 
 
@@ -56,6 +57,7 @@ app.use('/api', ForgotPassword );
 app.use('/api/company', ForgotCompanyPassword  );
 app.use('/api/user', createTravel  );
 app.use('/api/user', loginPass  );
+app.use('/api/user', Reservation  );
 
 // Start the Express server
 const PORT = process.env.PORT || 3000;
