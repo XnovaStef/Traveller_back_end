@@ -14,11 +14,20 @@ const companyDeletionRequest = require('../xnova_back_end/routes/CompanyRoutes')
 const ForgotPassword  = require('../xnova_back_end/routes/UserRoute');
 const ForgotCompanyPassword  = require('../xnova_back_end/routes/CompanyRoutes')
 const createTravel = require('../xnova_back_end/routes/UserRoute')
+const createColis = require('../xnova_back_end/routes/UserRoute')
 const loginPass = require('../xnova_back_end/routes/UserRoute')
 const countUsers = require('../xnova_back_end/routes/UserRoute')
 const countCompany = require('../xnova_back_end/routes/CompanyRoutes')
 const Reservation = require('../xnova_back_end/routes/UserRoute')
 const cors = require('cors'); 
+const everyUserInfo = require('../xnova_back_end/routes/UserRoute');
+const everyCompanyInfo = require('../xnova_back_end/routes/CompanyRoutes');
+const everyReservationInfo = require('../xnova_back_end/routes/UserRoute');
+const everyTravelInfo = require('../xnova_back_end/routes/UserRoute');
+const everyColisInfo = require('../xnova_back_end/routes/UserRoute');
+const countReservation = require('../xnova_back_end/routes/UserRoute');
+const countNotifs = require('../xnova_back_end/routes/UserRoute');
+const everyNotifInfo = require('../xnova_back_end/routes/UserRoute')
 
 
 
@@ -42,9 +51,11 @@ mongoose
 // Define API routes
 app.use('/api', UserModels);
 app.use('/api', countUsers);
+app.use('/api', everyUserInfo);
 app.use('/api', userLogin);
 app.use('/api',registerCompany);
 app.use('/api', countCompany);
+app.use('/api', everyCompanyInfo);
 app.use('/api',loginCompany);
 app.use('/api',modifyUserName);
 app.use('/api',modifyUserPassword);
@@ -56,8 +67,15 @@ app.use('/api', companyDeletionRequest);
 app.use('/api', ForgotPassword );
 app.use('/api/company', ForgotCompanyPassword  );
 app.use('/api/user', createTravel  );
+app.use('/api/user', createColis);
 app.use('/api/user', loginPass  );
 app.use('/api/user', Reservation  );
+app.use('/api', everyReservationInfo);
+app.use('/api', everyTravelInfo);
+app.use('/api', everyColisInfo);
+app.use('/api', countReservation);
+app.use('/api', countNotifs);
+app.use('/api', everyNotifInfo)
 
 // Start the Express server
 const PORT = process.env.PORT || 3000;

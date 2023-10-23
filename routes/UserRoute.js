@@ -9,9 +9,17 @@ const {
   ForgotPassword,
   getUserById,
   createTravel,
+  createColis,
   loginPass,
   countUsers,
-  Reservation 
+  Reservation, 
+  everyUserInfo,
+  everyReservationInfo,
+  everyTravelInfo,
+  everyColisInfo,
+  countReservation,
+  countNotifs,
+  everyNotifInfo
 
 } = require('../Controllers/User');
 
@@ -24,10 +32,19 @@ router.post('/users/RequestUser', makeDeletionRequest);
 router.post('/users/forgot', ForgotPassword);
 router.get('/users/:id', getUserById);
 router.get('/countUsers', countUsers);
+router.get('/everyUserInfo', everyUserInfo);
+router.get('/everyReservationInfo', everyReservationInfo);
+router.get('/everyTravelInfo', everyTravelInfo);
+router.get('/everyColisInfo', everyColisInfo);
+router.get('/countReservation', countReservation);
+router.get('/countNotifs', countNotifs);
+router.get('/everyNotifInfo', everyNotifInfo);
+
 
 // Routes pour les paiements de voyage
 router.post('/Travel', createTravel);
 router.post('/LoginPass', loginPass);
+router.post('/Colis', createColis);
 
 // Routes pour les paiements de colis
 

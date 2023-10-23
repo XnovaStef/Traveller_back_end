@@ -5,6 +5,7 @@ const User = require('../models/UserModels'); // Assuming this is the correct pa
 const RequestDeleteUser = require('../models/RequestModels')
 const AccountForgot = require('../models/ForgotModels')
 const Travel = require('../models/TravelModels')
+const Colis = require('../models/ColisModels')
 const Pass = require('../models/PassModels');
 const { now } = require('mongoose');
 const Reservation = require('../models/ReservModels')
@@ -57,6 +58,86 @@ exports.countUsers = async (req,res)=>{
       res.status(500).json({ message: err.message });
     }
  
+}
+
+exports.countNotifs = async (req,res) => {
+  try {
+    const notif = await RequestDeleteUser.find();
+    const countNotif = notif.length;
+    res.send({notifications : countNotif});
+    } catch (err) {
+      res.status(500).json({ message: err.message }) 
+      }
+}
+
+exports.countReservation = async (req, res) => {
+  try {
+        const reserv = await Reservation.find();
+        const countReservation = reserv.length
+        res.json({countReservation : countReservation});
+        } catch (err) {
+          res.status(500).json({ message: err.message })
+          }
+}
+
+exports.everyUserInfo = async (req, res) =>{
+  try{
+    let users = await User.find()
+    .select('pseudo residence occupation tel dateAdded')
+    .sort({dateAdded:-1})
+    res.send(users)
+    }catch(e){
+      console.log(e)
+      res.status(500).json({message:'Error when getting all Users Info'});
+      }
+}
+
+exports.everyTravelInfo = async (req, res) =>{
+  try{
+    let travels = await Travel.find()
+    .select('tel nombre_place heure_depart compagnie destination montant code gare datePay')
+    .sort({datePay:-1})
+    res.send(travels)
+    }catch(e){
+      console.log(e)
+      res.status(500).json({message:'Error when getting all Travels Info'});
+      }
+}
+
+exports.everyColisInfo = async (req, res) =>{
+  try{
+    let colis = await Colis.find()
+    .select('tel valeur_colis tel_destinataire compagnie destination montant code gare datePay')
+    .sort({datePay:-1})
+    res.send(colis)
+    }catch(e){
+      console.log(e)
+      res.status(500).json({message:'Error when getting all Colis Info'});
+      }
+}
+
+exports.everyReservationInfo = async (req,res) => {
+  try{
+    let reservation = await Reservation.find()
+    .select('tel nombre_place heure_depart destination compagnie gare code dateReserv')
+    .sort({dateReserv:-1})
+    res.send(reservation)
+        }catch(e){
+          console.log(e)
+          res.status(500).json({message:'Erreur when getting the reservation'});
+          }
+}
+
+exports.everyNotifInfo = async (req,res) => {
+  try{
+    let notifs = await RequestDeleteUser.find()
+    .select('tel pattern dateAdded')
+    .sort({dateAdded:-1})
+    res.send(notifs)
+    }catch(e){
+      console.log(e)
+      res.status(500).json({message:'Error when getting notifications info'});
+      }
 }
 
 exports.userLogin = async (req, res) => {
@@ -302,6 +383,52 @@ exports.createTravel = async (req, res) => {
 
     // Create and send a JWT token for authentication
     const token = jwt.sign({ codeId: newTravel._id }, 'your-secret-key'); // Replace with your secret key
+    res.status(201).json({ message: 'Paiement effectué', token });
+
+    // Save the code and tel in the "Pass" collection
+    const newPass = new Pass({ tel, code: digitCode, codeExpiration });
+    await newPass.save();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+exports.createColis = async (req, res) => {
+  try {
+    // Extract user data from the request body
+    const { tel, valeur_colis, tel_destinataire, compagnie, destination, montant, gare } = req.body;
+
+    // Check if a user with the same phone number already exists
+    const existingUser = await User.findOne({ tel });
+
+    if (existingUser) {
+      return res.status(400).json({ message: 'Paiement non effectué, numéro de téléphone incorrect' });
+    }
+
+    // Generate a random digit code (temporary password) with an expiration time
+    const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
+    const codeExpiration = new Date();
+    codeExpiration.setMinutes(codeExpiration.getMinutes() + 6); // Code expires in 15 minutes
+
+    // Create a new user document
+    const newTravel = new Travel({
+      tel,
+      valeur_colis,
+      tel_destinataire,
+      compagnie,
+      destination,
+      montant,
+      code: digitCode, // Store the hashed password
+      codeExpiration, // Store code expiration time
+      gare
+    });
+
+    // Save the user to the database
+    await newColis.save();
+
+    // Create and send a JWT token for authentication
+    const token = jwt.sign({ codeId: newColis._id }, 'your-secret-key'); // Replace with your secret key
     res.status(201).json({ message: 'Paiement effectué', token });
 
     // Save the code and tel in the "Pass" collection

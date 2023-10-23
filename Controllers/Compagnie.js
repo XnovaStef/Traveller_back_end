@@ -151,6 +151,21 @@ exports.getCompanyById = async (req, res) => {
   }
 }
 
+exports.everyCompanyInfo = async (req, res) => {
+  try {
+    let companies;
+    if (!req.query.search || !req.query.search.length > 0) {
+      companies = await Company.find().sort('-dateAdded');
+      } else {
+        companies = await Company.find({ name : {$regex : req.query.search , $options:'i'} }).sort('-dateAdded')
+        companies = await Company.find({ name : {$regex : req.query.search} }).sort('-dateAdded')
+        };
+        res.status(200).json(companies);
+        } catch (err) {
+          console.log("erreur", err);
+          res.status(500).send('Error -> '+err);
+          }
+}
 
 exports.loginCompany = async (req, res) => {
   try {

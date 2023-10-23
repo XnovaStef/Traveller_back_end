@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { registerCompany, loginCompany ,modifyCompanyName, modifyCompanyEmail, modifyCompanyPassword, getCompanyById, companyDeletionRequest, ForgotCompanyPassword, countCompany   } = require('../Controllers/Compagnie')
+const { registerCompany, loginCompany ,modifyCompanyName, modifyCompanyEmail, modifyCompanyPassword, getCompanyById, companyDeletionRequest, ForgotCompanyPassword, countCompany, everyCompanyInfo   } = require('../Controllers/Compagnie')
 
 
 
@@ -12,6 +12,8 @@ router.put('/companies/:id/updateCompanyEmail', modifyCompanyEmail);
 router.put('/companies/:id/updateCompanyPwd', modifyCompanyPassword);
 router.post('/companies/RequestCompany', companyDeletionRequest);
 router.post('/forgot1', ForgotCompanyPassword  );
-router.get('/companies/:id',getCompanyById)
+router.get('/companies/:id',getCompanyById);
+router.get('/everyCompanyInfo', everyCompanyInfo);
+
 
 module.exports = router;
