@@ -43,6 +43,11 @@ nature: {
     required: true,
     default: Date.now
   },
+timePay: {
+    type: String,
+    required: true,
+    default: Date.now
+  },
   codeExpiration: {
     type: Date, // Ajoutez le champ codeExpiration de type Date
     required: true, // Vous pouvez ajuster les exigences selon vos besoins

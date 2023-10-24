@@ -30,8 +30,13 @@ const ReservSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-      dateReserv: {
+      datePay: {
         type: Date,
+        required: true,
+        default: Date.now
+      },
+     timePay: {
+        type: String,
         required: true,
         default: Date.now
       },

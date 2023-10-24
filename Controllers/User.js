@@ -95,7 +95,7 @@ exports.everyUserInfo = async (req, res) =>{
 exports.everyTravelInfo = async (req, res) =>{
   try{
     let travels = await Travel.find()
-    .select('tel nombre_place heure_depart compagnie destination montant code gare datePay nature')
+    .select('tel nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
     .sort({datePay:-1})
     res.send(travels)
     }catch(e){
@@ -107,7 +107,7 @@ exports.everyTravelInfo = async (req, res) =>{
 exports.everyColisInfo = async (req, res) =>{
   try{
     let colis = await Colis.find()
-    .select('tel valeur_colis tel_destinataire compagnie destination montant code gare datePay nature')
+    .select('tel valeur_colis tel_destinataire compagnie destination montant code gare datePay nature timePay')
     .sort({datePay:-1})
     res.send(colis)
     }catch(e){
@@ -119,7 +119,7 @@ exports.everyColisInfo = async (req, res) =>{
 exports.everyReservationInfo = async (req,res) => {
   try{
     let reservation = await Reservation.find()
-    .select('tel nombre_place heure_depart destination compagnie gare code dateReserv nature')
+    .select('tel nombre_place heure_depart destination compagnie gare code datePay nature timePay')
     .sort({dateReserv:-1})
     res.send(reservation)
         }catch(e){
@@ -361,7 +361,7 @@ exports.createTravel = async (req, res) => {
     }
 
     // Automatically determine the 'nature' field value based on the presence of 'heure_validation'
-    const nature = heure_validation ? 'reservation' : 'voyage';
+    const nature = heure_validation ? 'réservation' : 'paiement';
 
     // Generate a random digit code (temporary password) with an expiration time
     const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
@@ -380,6 +380,8 @@ exports.createTravel = async (req, res) => {
       codeExpiration, // Store code expiration time
       gare,
       nature, // Automatically set the 'nature' field
+      datePay: new Date(), // Set the 'datePay' field to the current date and time
+      timePay: new Date().toLocaleTimeString(), // Set the 'timePay' field to the current time
     });
 
     // Save the user to the database
@@ -413,13 +415,13 @@ exports.createColis = async (req, res) => {
       return res.status(400).json({ message: 'Paiement non effectué, numéro de téléphone incorrect' });
     }
 
-       // Automatically determine the 'nature' field value based on the presence of 'heure_validation'
-       const nature = heure_validation ? 'reservation' : 'voyage';
+    // Automatically determine the 'nature' field value based on the presence of 'heure_validation'
+    const nature = heure_validation ? 'réservation' : 'paiement';
 
     // Generate a random digit code (temporary password) with an expiration time
     const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
     const codeExpiration = new Date();
-    codeExpiration.setMinutes(codeExpiration.getMinutes() + 6); // Code expires in 15 minutes
+    codeExpiration.setMinutes(codeExpiration.getMinutes() + 20); // Code expires in 20 minutes
 
     // Create a new user document
     const newColis = new Colis({
@@ -433,6 +435,8 @@ exports.createColis = async (req, res) => {
       codeExpiration, // Store code expiration time
       gare,
       nature, // Automatically set the 'nature' field
+      datePay: new Date(), // Set the 'datePay' field to the current date and time
+      timePay: new Date().toLocaleTimeString(), // Set the 'timePay' field to the current time
     });
 
     // Save the user to the database
@@ -450,6 +454,7 @@ exports.createColis = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 
 exports.loginPass = async (req, res) => {
@@ -547,6 +552,8 @@ exports.Reservation = async (req, res) => {
       destination,
       gare,
       nature, // Automatically set the 'nature' field
+      datePay: new Date(), // Set the 'datePay' field to the current date and time
+      timePay: new Date().toLocaleTimeString(), // Set the 'timePay' field to the current time
     });
 
     // Enregistrez la réservation dans la base de données
