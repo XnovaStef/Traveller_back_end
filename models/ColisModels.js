@@ -6,6 +6,10 @@ const ColisSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+nature: {
+    type: String,
+    required: true,
+  },
   valeur_colis: {
     type: Number,
     required: true,

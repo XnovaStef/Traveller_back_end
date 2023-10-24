@@ -14,7 +14,7 @@ router.post('/companies/RequestCompany', companyDeletionRequest);
 router.post('/forgot1', ForgotCompanyPassword  );
 router.get('/companies/:id',getCompanyById);
 router.get('/everyCompanyInfo', everyCompanyInfo);
-router.delete('/deleteCompanybyID/:id', deleteCompanybyID);
+router.delete('/deleteCompanybyID/:id?', deleteCompanybyID);
 
 
 module.exports = router;
