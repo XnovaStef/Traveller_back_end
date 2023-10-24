@@ -6,6 +6,10 @@ const TravelSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+nature: {
+    type: String,
+    required: true,
+  },
   nombre_place: {
     type: Number,
     required: true,
