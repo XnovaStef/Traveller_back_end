@@ -46,10 +46,10 @@ const CompanySchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  logo: {
+  /*logo: {
     data: Buffer, // Store the binary photo data
     contentType: String, // Store the content type of the photo (e.g., image/jpeg, image/png)
-  },
+  },*/
 });
 
 CompanySchema.plugin(uniqueValidator);

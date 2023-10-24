@@ -19,7 +19,9 @@ const {
   everyColisInfo,
   countReservation,
   countNotifs,
-  everyNotifInfo
+  everyNotifInfo,
+  deleteUserbyID,
+  countTransaction
 
 } = require('../Controllers/User');
 
@@ -38,7 +40,9 @@ router.get('/everyTravelInfo', everyTravelInfo);
 router.get('/everyColisInfo', everyColisInfo);
 router.get('/countReservation', countReservation);
 router.get('/countNotifs', countNotifs);
+router.get('/countTransaction', countTransaction);
 router.get('/everyNotifInfo', everyNotifInfo);
+router.delete('/deleteUserbyID/:id', deleteUserbyID);
 
 
 // Routes pour les paiements de voyage

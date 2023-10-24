@@ -80,6 +80,22 @@ exports.countReservation = async (req, res) => {
           }
 }
 
+exports.countTransaction = async (req, res) => {
+  try {
+        const reserv = await Reservation.find();
+        const countReservation = reserv.length
+        const colis = await Colis.find();
+        const countColis = colis.length
+        const travel = await Travel.find();
+        const countTravel = travel.length
+        let total = countReservation + countColis + countTravel;
+        res.json({Transactions : total})
+        }
+        catch (err) {
+          res.status(500).json({ message: err.message })
+          }
+}
+
 exports.everyUserInfo = async (req, res) =>{
   try{
     let users = await User.find()
@@ -95,7 +111,7 @@ exports.everyUserInfo = async (req, res) =>{
 exports.everyTravelInfo = async (req, res) =>{
   try{
     let travels = await Travel.find()
-    .select('tel nombre_place heure_depart compagnie destination montant code gare datePay')
+    .select('tel nature nombre_place heure_depart compagnie destination montant code gare datePay')
     .sort({datePay:-1})
     res.send(travels)
     }catch(e){
@@ -107,7 +123,7 @@ exports.everyTravelInfo = async (req, res) =>{
 exports.everyColisInfo = async (req, res) =>{
   try{
     let colis = await Colis.find()
-    .select('tel valeur_colis tel_destinataire compagnie destination montant code gare datePay')
+    .select('tel nature valeur_colis tel_destinataire compagnie destination montant code gare datePay')
     .sort({datePay:-1})
     res.send(colis)
     }catch(e){
@@ -119,7 +135,7 @@ exports.everyColisInfo = async (req, res) =>{
 exports.everyReservationInfo = async (req,res) => {
   try{
     let reservation = await Reservation.find()
-    .select('tel nombre_place heure_depart destination compagnie gare code dateReserv')
+    .select('tel nature nombre_place heure_depart destination compagnie gare code dateReserv')
     .sort({dateReserv:-1})
     res.send(reservation)
         }catch(e){
@@ -172,6 +188,20 @@ exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+exports.deleteUserbyID = async (req, res) => {
+  try {
+    const deletedUser = await User.findByIdAndRemove(req.params.id);
+    res.json(deletedUser);
+    if (!deletedUser) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    res.json({ message: "Utilisateur supprimé avec succès" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -298,6 +328,7 @@ exports.makeDeletionRequest = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 exports.ForgotPassword = async (req, res) => {
   try {
     // Check if the user with the provided phone number exists
@@ -412,7 +443,7 @@ exports.createColis = async (req, res) => {
     codeExpiration.setMinutes(codeExpiration.getMinutes() + 6); // Code expires in 15 minutes
 
     // Create a new user document
-    const newTravel = new Travel({
+    const newColis = new Colis({
       tel,
       valeur_colis,
       tel_destinataire,
@@ -468,20 +499,6 @@ exports.loginPass = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 exports.Reservation = async (req, res) => {
   try {
