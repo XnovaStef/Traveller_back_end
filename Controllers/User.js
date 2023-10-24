@@ -392,7 +392,7 @@ exports.createTravel = async (req, res) => {
     }
 
     // Automatically determine the 'nature' field value based on the presence of 'heure_validation'
-    const nature = heure_validation ? 'reservation' : 'voyage';
+    const nature = heure_validation ? 'reservation' : 'paiement';
 
     // Generate a random digit code (temporary password) with an expiration time
     const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
@@ -467,7 +467,7 @@ exports.createColis = async (req, res) => {
     }
 
        // Automatically determine the 'nature' field value based on the presence of 'heure_validation'
-       const nature = heure_validation ? 'reservation' : 'voyage';
+       const nature = heure_validation ? 'reservation' : 'paiement';
 
     // Generate a random digit code (temporary password) with an expiration time
     const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
@@ -572,7 +572,7 @@ exports.Reservation = async (req, res) => {
     codeExpiration.setMinutes(codeExpiration.getMinutes() + 15); // Code expires in 15 minutes
 
     // Automatically determine the 'nature' field value based on the presence of 'heure_validation'
-    const nature = heure_validation ? 'reservation' : 'voyage';
+    const nature = heure_validation ? 'reservation' : 'paiement';
 
     // Créez une nouvelle instance de Reservation avec les informations fournies
     const newReservation = new Reservation({
