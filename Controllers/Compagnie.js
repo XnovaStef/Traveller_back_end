@@ -106,10 +106,10 @@ exports.registerCompany = async (req, res) => {
           TarifColis,
           gareColis,
          depart,
-          logo: {
+          /*logo: {
             data: fs.readFileSync(path.join(__dirname, "../uploads/" + req.file.filename)),
             contentType: req.file.mimetype,
-          },
+          },*/
         });
 
         try {
@@ -149,6 +149,19 @@ exports.getCompanyById = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+}
+
+exports.deleteCompanybyID = async (req,res) => {
+  try{
+    const deleteCompany = await Company.findByIdAndRemove(req.params.id);
+    res.jsom(deleteCompany);
+    if(!deleteCompany){
+      throw new Error('Compagnie non trouvé');
+      }
+      res.send("Compagnie supprimée");
+      }catch(e){
+        res.status(400).send(`Error: ${e}`);
+      }
 }
 
 exports.everyCompanyInfo = async (req, res) => {

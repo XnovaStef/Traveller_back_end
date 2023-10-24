@@ -80,6 +80,22 @@ exports.countReservation = async (req, res) => {
           }
 }
 
+exports.countTransaction = async (req, res) => {
+  try {
+        const reserv = await Reservation.find();
+        const countReservation = reserv.length
+        const colis = await Colis.find();
+        const countColis = colis.length
+        const travel = await Travel.find();
+        const countTravel = travel.length
+        let total = countReservation + countColis + countTravel;
+        res.json({Transactions : total})
+        }
+        catch (err) {
+          res.status(500).json({ message: err.message })
+          }
+}
+
 exports.everyUserInfo = async (req, res) =>{
   try{
     let users = await User.find()
@@ -172,6 +188,20 @@ exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+exports.deleteUserbyID = async (req, res) => {
+  try {
+    const deletedUser = await User.findByIdAndRemove(req.params.id);
+    res.json(deletedUser);
+    if (!deletedUser) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    res.json({ message: "Utilisateur supprimé avec succès" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -298,6 +328,7 @@ exports.makeDeletionRequest = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 exports.ForgotPassword = async (req, res) => {
   try {
     // Check if the user with the provided phone number exists
@@ -361,7 +392,7 @@ exports.createTravel = async (req, res) => {
     }
 
     // Automatically determine the 'nature' field value based on the presence of 'heure_validation'
-    const nature = heure_validation ? 'réservation' : 'paiement';
+    const nature = heure_validation ? 'reservation' : 'voyage';
 
     // Generate a random digit code (temporary password) with an expiration time
     const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
@@ -400,7 +431,29 @@ exports.createTravel = async (req, res) => {
   }
 };
 
-
+exports.dataTravel = async (req,res) => {
+  try{
+    if (req.params.year) {
+      // Obtenir des données pour une année donnée
+      const selectedYear = parseInt(req.params.year, 10);
+      const startDate = new Date(selectedYear, 0, 1);
+      const endDate = new Date(selectedYear, 11, 31, 23, 59, 59);
+      const data = await Travel.find({
+        datePay: { $gte: startDate, $lte: endDate },
+      });
+      res.json(data);
+      } else {
+        //Obtenir des années distinctes
+        const years = await Travel.distinct('datePay', { datePay: { $ne: null } })
+        .then((dates) =>
+          dates.map((date) => new Date(date).getFullYear())
+        );
+        res.json([...new Set(years)]);
+        };
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      };
+}
 
 
 exports.createColis = async (req, res) => {
@@ -415,8 +468,8 @@ exports.createColis = async (req, res) => {
       return res.status(400).json({ message: 'Paiement non effectué, numéro de téléphone incorrect' });
     }
 
-    // Automatically determine the 'nature' field value based on the presence of 'heure_validation'
-    const nature = heure_validation ? 'réservation' : 'paiement';
+       // Automatically determine the 'nature' field value based on the presence of 'heure_validation'
+       const nature = heure_validation ? 'reservation' : 'voyage';
 
     // Generate a random digit code (temporary password) with an expiration time
     const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
@@ -485,20 +538,6 @@ exports.loginPass = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 exports.Reservation = async (req, res) => {
   try {
     // Récupérez les informations de la réservation à partir de la requête
@@ -538,7 +577,7 @@ exports.Reservation = async (req, res) => {
     codeExpiration.setMinutes(codeExpiration.getMinutes() + 15); // Code expires in 15 minutes
 
     // Automatically determine the 'nature' field value based on the presence of 'heure_validation'
-    const nature = heure_validation ? 'reservation' : 'voyage';
+    const nature = heure_validation ? 'reservation' : 'paiement';
 
     // Créez une nouvelle instance de Reservation avec les informations fournies
     const newReservation = new Reservation({

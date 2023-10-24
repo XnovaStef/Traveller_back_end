@@ -27,7 +27,11 @@ const everyTravelInfo = require('../xnova_back_end/routes/UserRoute');
 const everyColisInfo = require('../xnova_back_end/routes/UserRoute');
 const countReservation = require('../xnova_back_end/routes/UserRoute');
 const countNotifs = require('../xnova_back_end/routes/UserRoute');
-const everyNotifInfo = require('../xnova_back_end/routes/UserRoute')
+const everyNotifInfo = require('../xnova_back_end/routes/UserRoute');
+const deleteUserbyID = require('../xnova_back_end/routes/UserRoute');
+const deleteCompanybyID = require('../xnova_back_end/routes/CompanyRoutes');
+const countTransaction = require('../xnova_back_end/routes/UserRoute');
+const dataTravel = require('../xnova_back_end/routes/UserRoute');
 
 
 
@@ -75,7 +79,11 @@ app.use('/api', everyTravelInfo);
 app.use('/api', everyColisInfo);
 app.use('/api', countReservation);
 app.use('/api', countNotifs);
-app.use('/api', everyNotifInfo)
+app.use('/api', countTransaction);
+app.use('/api', everyNotifInfo);
+app.use('/api', deleteUserbyID);
+app.use('/api', deleteCompanybyID);
+app.use('/api', dataTravel);
 
 // Start the Express server
 const PORT = process.env.PORT || 3000;
