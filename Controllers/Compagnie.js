@@ -8,6 +8,7 @@ const RequestDeleteCompany = require('../models/RequestCompModels')
 const path = require('path');
 const fs = require('fs');
 const CompForgot = require('../models/ForgotCompModels')
+const Travel = require('../models/TravelModels')
 
 // Define multer disk storage
 const storage = multer.diskStorage({
@@ -199,19 +200,24 @@ exports.loginCompany = async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // If the email and password are valid, generate a JWT token
+    // If the email and password are valid, generate a JWT token with the company name
     const token = jwt.sign(
-      { companyId: company._id, email: company.email },
+      {
+        companyId: company._id,
+        email: company.email,
+        companyName: company.compagnie, // Include the company name in the JWT payload
+      },
       'your-secret-key', // Replace with your own secret key
       { expiresIn: '1h' } // Token expires in 1 hour (you can adjust the expiration time)
     );
 
-    res.status(200).json({ token, companyId: company._id, message: 'Login successful' });
+    res.status(200).json({ token, companyId: company._id, companyName: company.compagnie, message: 'Login successful' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 exports.modifyCompanyName = async (req, res) => {
   try {
@@ -395,6 +401,30 @@ exports.ForgotCompanyPassword = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 }
+
+// Exportez la fonction de recherche de voyages par compagnie
+exports.TravelSearch = async (req, res) => {
+  try {
+    // Extract the company name from the JWT payload
+    const companyName = req.company.companyName; // Assuming 'req.user' holds the JWT payload
+
+    // Use the 'companyName' in your query to retrieve travel records for the specific company
+    const travels = await Travel.find({ compagnie: companyName })
+      .select('compagnie datePay gare montant timePay datePay'); // Sélectionnez uniquement les champs "compagnie" et "datePay"
+
+    if (travels.length === 0) {
+      return res.status(404).json({ message: 'Aucun voyage trouvé pour cette compagnie.' });
+    }
+
+    res.json(travels);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Erreur lors de la recherche des voyages.' });
+  }
+};
+
+
+
 
 
 

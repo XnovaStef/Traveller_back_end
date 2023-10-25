@@ -32,6 +32,7 @@ const deleteUserbyID = require('../xnova_back_end/routes/UserRoute');
 const deleteCompanybyID = require('../xnova_back_end/routes/CompanyRoutes');
 const countTransaction = require('../xnova_back_end/routes/UserRoute');
 const dataTravel = require('../xnova_back_end/routes/UserRoute');
+const TravelSearch = require('../xnova_back_end/routes/CompanyRoutes')
 
 
 
@@ -60,7 +61,7 @@ app.use('/api', userLogin);
 app.use('/api',registerCompany);
 app.use('/api', countCompany);
 app.use('/api', everyCompanyInfo);
-app.use('/api',loginCompany);
+app.use('/api/company',loginCompany);
 app.use('/api',modifyUserName);
 app.use('/api',modifyUserPassword);
 app.use('/api',modifyCompanyName);
@@ -69,7 +70,7 @@ app.use('/api', modifyCompanyPassword);
 app.use('/api',  makeDeletionRequest);
 app.use('/api', companyDeletionRequest);
 app.use('/api', ForgotPassword );
-app.use('/api/company', ForgotCompanyPassword  );
+app.use('/api', ForgotCompanyPassword  );
 app.use('/api/user', createTravel  );
 app.use('/api/user', createColis);
 app.use('/api/user', loginPass  );
@@ -84,6 +85,7 @@ app.use('/api', everyNotifInfo);
 app.use('/api', deleteUserbyID);
 app.use('/api', deleteCompanybyID);
 app.use('/api', dataTravel);
+app.use('/api', TravelSearch);
 
 // Start the Express server
 const PORT = process.env.PORT || 3000;
