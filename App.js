@@ -32,7 +32,9 @@ const deleteUserbyID = require('../xnova_back_end/routes/UserRoute');
 const deleteCompanybyID = require('../xnova_back_end/routes/CompanyRoutes');
 const countTransaction = require('../xnova_back_end/routes/UserRoute');
 const dataTravel = require('../xnova_back_end/routes/UserRoute');
-const TravelSearch = require('../xnova_back_end/routes/CompanyRoutes')
+const Admin = require('../xnova_back_end/routes/AdminRoutes')
+const AdminLogin = require('../xnova_back_end/routes/AdminRoutes')
+
 
 
 
@@ -85,7 +87,9 @@ app.use('/api', everyNotifInfo);
 app.use('/api', deleteUserbyID);
 app.use('/api', deleteCompanybyID);
 app.use('/api', dataTravel);
-app.use('/api', TravelSearch);
+app.use('/api', Admin);
+app.use('/api', AdminLogin);
+
 
 // Start the Express server
 const PORT = process.env.PORT || 3000;
