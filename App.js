@@ -33,7 +33,14 @@ const deleteCompanybyID = require('../xnova_back_end/routes/CompanyRoutes');
 const countTransaction = require('../xnova_back_end/routes/UserRoute');
 const dataTravel = require('../xnova_back_end/routes/UserRoute');
 const Admin = require('../xnova_back_end/routes/AdminRoutes')
-const AdminLogin = require('../xnova_back_end/routes/AdminRoutes')
+const AdminLogin = require('../xnova_back_end/routes/AdminRoutes');
+const getALlDestinationTravel = require('../xnova_back_end/routes/CompanyRoutes');
+const { getAllDestinationTravel } = require('./Controllers/Compagnie');
+const   getTravelInfoByTel = require('../xnova_back_end/routes/UserRoute');
+const   getColisInfoByTel = require('../xnova_back_end/routes/UserRoute');
+const   getReservInfoByTel = require('../xnova_back_end/routes/UserRoute');
+//const  getUserByTel = require('../xnova_back_end/routes/UserRoute');
+
 
 
 
@@ -63,6 +70,7 @@ app.use('/api', userLogin);
 app.use('/api',registerCompany);
 app.use('/api', countCompany);
 app.use('/api', everyCompanyInfo);
+app.use('/api', getAllDestinationTravel);
 app.use('/api/company',loginCompany);
 app.use('/api',modifyUserName);
 app.use('/api',modifyUserPassword);
@@ -89,6 +97,10 @@ app.use('/api', deleteCompanybyID);
 app.use('/api', dataTravel);
 app.use('/api', Admin);
 app.use('/api', AdminLogin);
+app.use('/api', getTravelInfoByTel );
+app.use('/api', getColisInfoByTel );
+app.use('/api', getReservInfoByTel );
+//app.use('/api',  getUserByTel );
 
 
 // Start the Express server

@@ -8,7 +8,7 @@ const Travel = require('../models/TravelModels')
 const Colis = require('../models/ColisModels')
 const Pass = require('../models/PassModels');
 const { now } = require('mongoose');
-const Reservation = require('../models/ReservModels')
+const Reservation = require('../models/ReservModels');
 //const crypto = require('crypto');
 
 
@@ -111,7 +111,7 @@ exports.everyUserInfo = async (req, res) =>{
 exports.everyTravelInfo = async (req, res) =>{
   try{
     let travels = await Travel.find()
-    .select('tel nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
+    .select('phone nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
     .sort({datePay:-1})
     res.send(travels)
     }catch(e){
@@ -119,6 +119,79 @@ exports.everyTravelInfo = async (req, res) =>{
       res.status(500).json({message:'Error when getting all Travels Info'});
       }
 }
+
+exports.getTravelInfoByTel = async (req, res) => {
+  const { phone } = req.body; // Assurez-vous que vous avez configuré votre route pour inclure le paramètre "tel" dans l'URL.
+
+  try {
+    // Vérifiez d'abord si le numéro de téléphone existe dans la base de données.
+    const user = await User.findOne({ tel }); // Assurez-vous d'adapter ceci en fonction du modèle utilisateur de votre base de données.
+
+    if (user) {
+      // Si l'utilisateur existe, recherchez les voyages associés à ce numéro de téléphone.
+      const travels = await Travel.find({ phone})
+        .select('phone nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
+        .sort({ datePay: -1 });
+
+      res.send(travels);
+    } else {
+      // Si l'utilisateur n'existe pas, renvoyez un message indiquant qu'aucun utilisateur n'a été trouvé.
+      res.status(404).json({ message: 'Aucun utilisateur avec ce numéro de téléphone trouvé.' });
+    }
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Erreur lors de la récupération des informations de voyage.' });
+  }
+};
+
+exports.getColisInfoByTel = async (req, res) => {
+  const { phone } = req.body; // Assurez-vous que vous avez configuré votre route pour inclure le paramètre "tel" dans l'URL.
+
+  try {
+    // Vérifiez d'abord si le numéro de téléphone existe dans la base de données.
+    const user = await User.findOne({ phone }); // Assurez-vous d'adapter ceci en fonction du modèle utilisateur de votre base de données.
+
+    if (user) {
+      // Si l'utilisateur existe, recherchez les voyages associés à ce numéro de téléphone.
+      const colis = await Colis.find({phone })
+        .select('phone valeur_colis tel_destinataire compagnie destination montant code gare datePay nature timePay')
+        .sort({ datePay: -1 });
+
+      res.send(colis);
+    } else {
+      // Si l'utilisateur n'existe pas, renvoyez un message indiquant qu'aucun utilisateur n'a été trouvé.
+      res.status(404).json({ message: 'Aucun utilisateur avec ce numéro de téléphone trouvé.' });
+    }
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Erreur lors de la récupération des informations de voyage.' });
+  }
+};
+
+
+exports.getReservInfoByTel = async (req, res) => {
+  const { phone } = req.body; // Assurez-vous que vous avez configuré votre route pour inclure le paramètre "tel" dans l'URL.
+
+  try {
+    // Vérifiez d'abord si le numéro de téléphone existe dans la base de données.
+    const user = await User.findOne({ phone }); // Assurez-vous d'adapter ceci en fonction du modèle utilisateur de votre base de données.
+
+    if (user) {
+      // Si l'utilisateur existe, recherchez les voyages associés à ce numéro de téléphone.
+      const reserv = await Reservation.find({ phone })
+        .select('phone nombre_place heure_depart heure_validation compagnie destination code gare datePay nature timePay')
+        .sort({ datePay: -1 });
+
+      res.send(reserv);
+    } else {
+      // Si l'utilisateur n'existe pas, renvoyez un message indiquant qu'aucun utilisateur n'a été trouvé.
+      res.status(404).json({ message: 'Aucun utilisateur avec ce numéro de téléphone trouvé.' });
+    }
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Erreur lors de la récupération des informations de voyage.' });
+  }
+};
 
 exports.everyColisInfo = async (req, res) =>{
   try{
@@ -192,6 +265,26 @@ exports.getUserById = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 }
+
+/*exports.getUserByTel = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      // Vous pouvez extraire le numéro de téléphone de l'utilisateur ici
+      const phoneNumber = user.tel;
+
+      // Vous pouvez également inclure d'autres informations de l'utilisateur dans la réponse si nécessaire
+
+
+      res.json(phoneNumber);
+    } else {
+      res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}*/
+
 
 exports.deleteUserbyID = async (req, res) => {
   try {
@@ -382,10 +475,13 @@ exports.getCodeById = async (req, res) => {
 exports.createTravel = async (req, res) => {
   try {
     // Extract user data from the request body
-    const { tel, nombre_place, heure_depart, compagnie, destination, montant, gare, heure_validation } = req.body;
+    let {phone, nombre_place, heure_depart, compagnie, destination, montant, gare, heure_validation } = req.body;
+
+    // Add "+225" to the beginning of the phone number
+    //tel = "+225" + tel;
 
     // Check if a user with the same phone number already exists
-    const existingUser = await User.findOne({ tel });
+    const existingUser = await User.findOne({phone });
 
     if (existingUser) {
       return res.status(400).json({ message: 'Paiement non effectué, numéro de téléphone incorrect' });
@@ -401,7 +497,7 @@ exports.createTravel = async (req, res) => {
 
     // Create a new user document
     const newTravel = new Travel({
-      tel,
+     phone: "+225" + phone,
       nombre_place,
       heure_depart,
       compagnie,
@@ -423,13 +519,14 @@ exports.createTravel = async (req, res) => {
     res.status(201).json({ message: 'Paiement effectué', token });
 
     // Save the code and tel in the "Pass" collection
-    const newPass = new Pass({ tel, code: digitCode, codeExpiration });
+    const newPass = new Pass({ phone, code: digitCode, codeExpiration });
     await newPass.save();
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 exports.dataTravel = async (req,res) => {
   try{
@@ -459,17 +556,17 @@ exports.dataTravel = async (req,res) => {
 exports.createColis = async (req, res) => {
   try {
     // Extract user data from the request body
-    const { tel, valeur_colis, tel_destinataire, compagnie, destination, montant, gare, heure_validation } = req.body;
+    const { phone, valeur_colis, tel_destinataire, compagnie, destination, montant, gare, heure_validation } = req.body;
 
     // Check if a user with the same phone number already exists
-    const existingUser = await User.findOne({ tel });
+    const existingUser = await User.findOne({ phone });
 
     if (existingUser) {
       return res.status(400).json({ message: 'Paiement non effectué, numéro de téléphone incorrect' });
     }
 
        // Automatically determine the 'nature' field value based on the presence of 'heure_validation'
-       const nature = heure_validation ? 'reservation' : 'voyage';
+       const nature = heure_validation ? 'reservation' : 'colis';
 
     // Generate a random digit code (temporary password) with an expiration time
     const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
@@ -478,7 +575,7 @@ exports.createColis = async (req, res) => {
 
     // Create a new user document
     const newColis = new Colis({
-      tel,
+      phone: "+225" + phone,
       valeur_colis,
       tel_destinataire,
       compagnie,
@@ -500,7 +597,7 @@ exports.createColis = async (req, res) => {
     res.status(201).json({ message: 'Paiement effectué', token });
 
     // Save the code and tel in the "Pass" collection
-    const newPass = new Pass({ tel, code: digitCode, codeExpiration });
+    const newPass = new Pass({ phone, code: digitCode, codeExpiration });
     await newPass.save();
   } catch (error) {
     console.error(error);
@@ -541,9 +638,9 @@ exports.loginPass = async (req, res) => {
 exports.Reservation = async (req, res) => {
   try {
     // Récupérez les informations de la réservation à partir de la requête
-    const { tel, nombre_place, heure_depart, compagnie, destination, gare } = req.body;
+    const {phone, nombre_place, heure_depart, compagnie, destination, gare } = req.body;
 
-    const existingUser = await User.findOne({ tel });
+    const existingUser = await User.findOne({ phone });
 
     if (existingUser) {
       return res.status(400).json({ message: 'Paiement non effectué, numéro de téléphone incorrect' });
@@ -581,7 +678,7 @@ exports.Reservation = async (req, res) => {
 
     // Créez une nouvelle instance de Reservation avec les informations fournies
     const newReservation = new Reservation({
-      tel,
+      phone: "+225" + phone,
       nombre_place,
       heure_depart: heure_depart_date,
       heure_validation,
@@ -599,7 +696,7 @@ exports.Reservation = async (req, res) => {
     const reservationEnregistree = await newReservation.save();
 
     // Save the code and tel in the "Pass" collection
-    const newPass = new Pass({ tel, code: digitCode, codeExpiration });
+    const newPass = new Pass({ phone, code: digitCode, codeExpiration });
     await newPass.save();
 
     // Create and send a JWT token for authentication

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // Modèle de données pour les paiements
 const ReservSchema = new mongoose.Schema({
-    tel: {
+    phone: {
         type: String,
         required: true,
       },
@@ -15,6 +15,10 @@ const ReservSchema = new mongoose.Schema({
         required: true,
       },
       heure_depart: {
+        type: String,
+        required: true,
+      },
+      heure_validation: {
         type: String,
         required: true,
       },

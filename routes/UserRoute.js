@@ -23,6 +23,10 @@ const {
   deleteUserbyID,
   countTransaction,
   dataTravel,
+  getTravelInfoByTel,
+  getColisInfoByTel,
+  getReservInfoByTel,
+  getUserByTel
 
 } = require('../Controllers/User');
 
@@ -45,12 +49,16 @@ router.get('/countTransaction', countTransaction);
 router.get('/everyNotifInfo', everyNotifInfo);
 router.get('/dataTravel/:year?', dataTravel);
 router.delete('/deleteUserbyID/:id?', deleteUserbyID);
+//router.get('/user/:id',  getUserByTel);
 
 
 // Routes pour les paiements de voyage
 router.post('/Travel', createTravel);
 router.post('/LoginPass', loginPass);
 router.post('/Colis', createColis);
+router.get('/getTravelInfoTel', getTravelInfoByTel);
+router.get('/getColisInfoTel', getColisInfoByTel);
+router.get('/getReservInfoTel', getReservInfoByTel);
 
 // Routes pour les paiements de colis
 

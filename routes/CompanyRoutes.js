@@ -1,6 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const { registerCompany, loginCompany ,modifyCompanyName, modifyCompanyEmail, modifyCompanyPassword, getCompanyById, companyDeletionRequest, ForgotCompanyPassword, countCompany, everyCompanyInfo, deleteCompanybyID   } = require('../Controllers/Compagnie')
+const { registerCompany, 
+    loginCompany ,
+    modifyCompanyName,
+     modifyCompanyEmail, modifyCompanyPassword, 
+     getCompanyById, 
+     companyDeletionRequest, 
+     ForgotCompanyPassword, 
+     countCompany, 
+     everyCompanyInfo, 
+     deleteCompanybyID, 
+     getAllDestinationTravel ,
+    } = require('../Controllers/Compagnie')
 
 
 
@@ -15,6 +26,8 @@ router.post('/forgot1', ForgotCompanyPassword  );
 router.get('/companies/:id',getCompanyById);
 router.get('/everyCompanyInfo', everyCompanyInfo);
 router.delete('/deleteCompanybyID/:id?', deleteCompanybyID);
+router.get('/getDestinationTravel', getAllDestinationTravel);
+
 
 
 module.exports = router;

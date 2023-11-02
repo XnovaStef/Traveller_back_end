@@ -143,6 +143,8 @@ exports.countCompany = async (req, res) => {
 };
 
 
+
+
 exports.getCompanyById = async (req, res) => {
   try {
     const company = await Company.findById(req.params.id);
@@ -180,6 +182,21 @@ exports.everyCompanyInfo = async (req, res) => {
           res.status(500).send('Error -> '+err);
           }
 }
+
+// Importez le modèle de votre compagnie
+
+exports.getAllDestinationTravel = async (req, res) => {
+  try{
+    let company = await Company.find()
+    .select('destinationTravel dateAdded compagnie')
+    .sort({dateAdded:-1})
+    res.send(company)
+    }catch(e){
+      console.log(e)
+      res.status(500).json({message:'Error when getting all company Info'});
+      }
+};
+
 
 exports.loginCompany = async (req, res) => {
   try {

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // Modèle de données pour les paiements
 const TravelSchema = new mongoose.Schema({
-  tel: {
+phone: {
     type: String,
     required: true,
   },
