@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const {Admin, AdminLogin }  = require('../Controllers/Admin');
+const {Admin, AdminLogin, forgotAdmin} = require('../Controllers/Admin')
 
-
-router.post('/Admin', Admin);
-router.post('/AdminLogin', AdminLogin);
+router.post('/registerAdmin', Admin);
+router.post('/loginAdmin', AdminLogin);
+router.post('/forgotAdmin', forgotAdmin);
 
 module.exports = router;

@@ -10,6 +10,7 @@ const fs = require('fs');
 const CompForgot = require('../models/ForgotCompModels')
 const Travel = require('../models/TravelModels')
 
+
 // Define multer disk storage
 const storage = multer.diskStorage({
   destination: './uploads/',
@@ -141,6 +142,8 @@ exports.countCompany = async (req, res) => {
     res.status(500).json({ message: 'Erreur interne du serveur' });
   }
 };
+
+
 
 
 
