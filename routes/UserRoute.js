@@ -20,13 +20,15 @@ const {
   countReservation,
   countNotifs,
   everyNotifInfo,
-  deleteUserbyID,
+  //deleteUserbyID,
+  UserDelete,
   countTransaction,
   dataTravel,
   getTravelInfoByTel,
   getColisInfoByTel,
   getReservInfoByTel,
-  getUserByTel
+  getUserByTel,
+  countStatistics
 
 } = require('../Controllers/User');
 
@@ -48,7 +50,9 @@ router.get('/countNotifs', countNotifs);
 router.get('/countTransaction', countTransaction);
 router.get('/everyNotifInfo', everyNotifInfo);
 router.get('/dataTravel/:year?', dataTravel);
-router.delete('/deleteUserbyID/:id?', deleteUserbyID);
+//router.delete('/deleteUserbyID/:id?', deleteUserbyID);
+router.delete('/deleteUser', UserDelete);
+router.get('/statistics', countStatistics);
 //router.get('/user/:id',  getUserByTel);
 
 

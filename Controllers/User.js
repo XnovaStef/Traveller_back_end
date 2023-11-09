@@ -10,6 +10,7 @@ const Pass = require('../models/PassModels');
 const { now } = require('mongoose');
 const Reservation = require('../models/ReservModels');
 //const crypto = require('crypto');
+const moment = require('moment');
 
 
 // Define a route for user registration
@@ -49,6 +50,33 @@ exports.UserModels = async (req, res) => {
   }
 };
 
+exports.UserDelete = async (req, res) => {
+  try {
+    // Recherche de l'utilisateur par le numéro de téléphone
+    const { tel, password } = req.body;
+
+    const user = await User.findOne({ tel });
+
+    // Vérification si l'utilisateur existe
+    if (!user) {
+      return res.status(400).json({ message: 'User with this phone number already exists' });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    // Vérification du mot de passe
+    if (!passwordMatch) {
+      return res.status(401).json({ message: 'Invalid phone number or password' });
+    }
+
+    // Suppression de l'utilisateur s'il existe et le mot de passe est correct
+    await User.findOneAndRemove({ _id: user._id });
+    return res.status(400).json({ message: 'utilisateur supprimé' });
+  } catch (error) {
+    return res.status(400).json({ message: 'internal error' });
+  }
+};
+
 exports.countUsers = async (req,res)=>{
   try{
       const user = await User.find(); // récupérer tous les utilisateurs
@@ -59,6 +87,36 @@ exports.countUsers = async (req,res)=>{
     }
  
 }
+
+exports.countStatistics = async (req, res) => {
+  try {
+    const totalTravelCount = await Travel.countDocuments();
+    const totalReservationCount = await Reservation.countDocuments();
+    const totalColisCount = await Colis.countDocuments();
+
+    const totalDocuments = totalTravelCount + totalReservationCount + totalColisCount;
+
+    if (totalDocuments === 0) {
+      return res.json({ travelCount: 0, reservationCount: 0, colisCount: 0 });
+    }
+
+    const travelCount = totalTravelCount / totalDocuments;
+    const reservationCount = totalReservationCount / totalDocuments;
+    const colisCount = totalColisCount / totalDocuments;
+
+    const counts = {
+      travelCount: travelCount.toFixed(2),
+      reservationCount: reservationCount.toFixed(2),
+      colisCount: colisCount.toFixed(2),
+    };
+
+    res.json(counts);
+  } catch (error) {
+    console.error("Erreur lors du calcul des statistiques :", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 exports.countNotifs = async (req,res) => {
   try {

@@ -224,14 +224,13 @@ exports.loginCompany = async (req, res) => {
     const token = jwt.sign(
       {
         companyId: company._id,
-        email: company.email,
-        companyName: company.compagnie, // Include the company name in the JWT payload
+       
       },
       'your-secret-key', // Replace with your own secret key
       { expiresIn: '1h' } // Token expires in 1 hour (you can adjust the expiration time)
     );
 
-    res.status(200).json({ token, companyId: company._id, companyName: company.compagnie, message: 'Login successful' });
+    res.status(200).json({ token, companyId: company._id,  message: 'Login successful' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
