@@ -50,32 +50,38 @@ exports.UserModels = async (req, res) => {
   }
 };
 
-exports.UserDelete = async (req, res) => {
+exports.deleteUser = async (req, res) => {
   try {
-    // Recherche de l'utilisateur par le numéro de téléphone
+    // Extract user data from the request body
     const { tel, password } = req.body;
 
+    // Find the user by their phone number
     const user = await User.findOne({ tel });
 
-    // Vérification si l'utilisateur existe
+    // Check if the user exists
     if (!user) {
-      return res.status(400).json({ message: 'User with this phone number already exists' });
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    // Compare the provided password with the hashed password in the database
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    // Vérification du mot de passe
-    if (!passwordMatch) {
-      return res.status(401).json({ message: 'Invalid phone number or password' });
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid password' });
     }
 
-    // Suppression de l'utilisateur s'il existe et le mot de passe est correct
-    await User.findOneAndRemove({ _id: user._id });
-    return res.status(400).json({ message: 'utilisateur supprimé' });
+    // If the password is valid, delete the user
+    await User.deleteOne({ _id: user._id });
+
+    res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
-    return res.status(400).json({ message: 'internal error' });
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+
 
 exports.countUsers = async (req,res)=>{
   try{
@@ -116,6 +122,50 @@ exports.countStatistics = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.countStatisticsByCompany = async (req, res) => {
+  try {
+    // Recherchez toutes les compagnies dans chaque collection pertinente
+    const allCompanies = new Set(); // Utilisez un ensemble pour éviter les doublons
+
+    const collections = [Travel, Reservation, Colis];
+
+    for (const collection of collections) {
+      const companies = await collection.distinct('compagnie');
+      companies.forEach((company) => allCompanies.add(company));
+    }
+
+    const statsByCompany = [];
+
+    for (const company of allCompanies) {
+      // Obtenez le nombre de documents pour chaque type
+      const travelCount = await Travel.countDocuments({ compagnie: company });
+      const reservationCount = await Reservation.countDocuments({ compagnie: company });
+      const colisCount = await Colis.countDocuments({ compagnie: company });
+
+      const totalDocuments = travelCount + reservationCount + colisCount;
+
+      if (totalDocuments > 0) {
+        statsByCompany.push({
+          company: company,
+          travelCount: ((travelCount / totalDocuments) * 100).toFixed(2),
+          reservationCount: ((reservationCount / totalDocuments) * 100).toFixed(2),
+          colisCount: ((colisCount / totalDocuments) * 100).toFixed(2),
+        });
+      }
+    }
+
+    // Return the statistics as a JSON response
+    res.json(statsByCompany);
+  } catch (error) {
+    // Handle any errors and send an appropriate response
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+
 
 
 exports.countNotifs = async (req,res) => {
@@ -344,7 +394,7 @@ exports.getUserById = async (req, res) => {
 }*/
 
 
-exports.deleteUserbyID = async (req, res) => {
+/*exports.deleteUserbyID = async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndRemove(req.params.id);
     res.json(deletedUser);
@@ -356,7 +406,7 @@ exports.deleteUserbyID = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-}
+}*/
 
 exports.modifyUserName = async (req, res) => {
   try {

@@ -40,8 +40,9 @@ const getAllDestinationTravel = require('../xnova_back_end/routes/CompanyRoutes'
 const   getTravelInfoByTel = require('../xnova_back_end/routes/UserRoute');
 const   getColisInfoByTel = require('../xnova_back_end/routes/UserRoute');
 const   getReservInfoByTel = require('../xnova_back_end/routes/UserRoute');
-const UserDelete = require('../xnova_back_end/routes/UserRoute');
-const countStatistics = require('../xnova_back_end/routes/UserRoute')
+const countStatistics = require('../xnova_back_end/routes/UserRoute');
+const deleteUser = require('../xnova_back_end/routes/UserRoute');
+const  countStatisticsByCompany = require('../xnova_back_end/routes/UserRoute')
 //const  getUserByTel = require('../xnova_back_end/routes/UserRoute');
 
 
@@ -105,8 +106,9 @@ app.use('/api', getTravelInfoByTel );
 app.use('/api', getColisInfoByTel );
 app.use('/api', getReservInfoByTel );
 //app.use('/api',  getUserByTel );
-app.use('/api',  UserDelete );
 app.use('/api', countStatistics);
+app.use('/api', deleteUser);
+app.use('api',  countStatisticsByCompany)
 
 
 // Start the Express server
