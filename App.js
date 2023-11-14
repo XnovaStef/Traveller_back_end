@@ -32,6 +32,7 @@ const deleteUserbyID = require('../xnova_back_end/routes/UserRoute');
 const deleteCompanybyID = require('../xnova_back_end/routes/CompanyRoutes');
 const countTransaction = require('../xnova_back_end/routes/UserRoute');
 const dataTravel = require('../xnova_back_end/routes/UserRoute');
+const dataReservation= require('../xnova_back_end/routes/UserRoute');
 const Admin = require('../xnova_back_end/routes/AdminRoutes')
 const forgotAdmin = require('../xnova_back_end/routes/AdminRoutes')
 const AdminLogin = require('../xnova_back_end/routes/AdminRoutes');
@@ -42,7 +43,8 @@ const   getColisInfoByTel = require('../xnova_back_end/routes/UserRoute');
 const   getReservInfoByTel = require('../xnova_back_end/routes/UserRoute');
 const countStatistics = require('../xnova_back_end/routes/UserRoute');
 const deleteUser = require('../xnova_back_end/routes/UserRoute');
-const  countStatisticsByCompany = require('../xnova_back_end/routes/UserRoute')
+const  countStatisticsByCompany = require('../xnova_back_end/routes/UserRoute');
+const rankingCompany = require('../xnova_back_end/routes/UserRoute');
 //const  getUserByTel = require('../xnova_back_end/routes/UserRoute');
 
 
@@ -84,7 +86,7 @@ app.use('/api',modifyCompanyEmail);
 app.use('/api', modifyCompanyPassword);
 app.use('/api',  makeDeletionRequest);
 app.use('/api', companyDeletionRequest);
-app.use('/api', ForgotPassword );
+app.use('/api', ForgotPassword );  
 app.use('/api', ForgotCompanyPassword  );
 app.use('/api/user', createTravel  );
 app.use('/api/user', createColis);
@@ -96,10 +98,12 @@ app.use('/api', everyColisInfo);
 app.use('/api', countReservation);
 app.use('/api', countNotifs);
 app.use('/api', countTransaction);
+app.use('/api', rankingCompany);
 app.use('/api', everyNotifInfo);
 app.use('/api', deleteUserbyID);
 app.use('/api', deleteCompanybyID);
 app.use('/api', dataTravel);
+app.use('/api', dataReservation);
 app.use('/api/', Admin);
 app.use('/api', AdminLogin);
 app.use('/api', getTravelInfoByTel );

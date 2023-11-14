@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/UserModels'); // Assuming this is the correct path to your User model
 const RequestDeleteUser = require('../models/RequestModels')
 const AccountForgot = require('../models/ForgotModels')
-const Travel = require('../models/TravelModels')
+const Reservations = require('../models/TravelModels')
 const Colis = require('../models/ColisModels')
 const Pass = require('../models/PassModels');
 const { now } = require('mongoose');
@@ -80,9 +80,6 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-
-
-
 exports.countUsers = async (req,res)=>{
   try{
       const user = await User.find(); // récupérer tous les utilisateurs
@@ -96,7 +93,7 @@ exports.countUsers = async (req,res)=>{
 
 exports.countStatistics = async (req, res) => {
   try {
-    const totalTravelCount = await Travel.countDocuments();
+    const totalTravelCount = await Reservations.countDocuments();
     const totalReservationCount = await Reservation.countDocuments();
     const totalColisCount = await Colis.countDocuments();
 
@@ -128,7 +125,7 @@ exports.countStatisticsByCompany = async (req, res) => {
     // Recherchez toutes les compagnies dans chaque collection pertinente
     const allCompanies = new Set(); // Utilisez un ensemble pour éviter les doublons
 
-    const collections = [Travel, Reservation, Colis];
+    const collections = [Reservations, Reservation, Colis];
 
     for (const collection of collections) {
       const companies = await collection.distinct('compagnie');
@@ -139,7 +136,7 @@ exports.countStatisticsByCompany = async (req, res) => {
 
     for (const company of allCompanies) {
       // Obtenez le nombre de documents pour chaque type
-      const travelCount = await Travel.countDocuments({ compagnie: company });
+      const travelCount = await Reservations.countDocuments({ compagnie: company });
       const reservationCount = await Reservation.countDocuments({ compagnie: company });
       const colisCount = await Colis.countDocuments({ compagnie: company });
 
@@ -164,15 +161,48 @@ exports.countStatisticsByCompany = async (req, res) => {
   }
 };
 
+exports.rankingCompany = async (req, res) => {
+  try {
+    const allcompagnie = new Set();
 
+    const compagnies = [Reservations, Reservation, Colis]
 
+    for(const compagnie of compagnies){
+      const resultat = await compagnie.distinct('compagnie');
+      resultat.forEach((result) => allcompagnie.add(result));
+    }
+    const rankbycompany = [];
+    for(const compagnia of allcompagnie){
+      // Obtenez le nombre de documents pour chaque type
+      const travels = await Reservations.countDocuments({compagnie : compagnia});
+      const reservations = await Reservation.countDocuments({compagnie : compagnia});
+      const coliss = await Colis.countDocuments({compagnie : compagnia});
+      
+      const totaldocuments = travels+reservations+coliss;
+      
+      rankbycompany.push({ compagnia, totaldocuments });
+    }
+    
+    // Classer les compagnies par le nombre total de documents (du plus grand au plus petit)
+    rankbycompany.sort((a, b) => b.totaldocuments - a.totaldocuments);
+
+    console.log(rankbycompany);
+
+    // Return the statistics as a JSON response
+    res.json(rankbycompany);
+
+  } catch (error) {
+    console.error('Erreur lors du classement des compagnies par nombre d\'apparitions dans les voyages :', error);
+    res.status(500).json({ success: false, error: 'Une erreur est survenue lors du classement des compagnies.' });
+  }
+};
 
 
 exports.countNotifs = async (req,res) => {
   try {
     const notif = await RequestDeleteUser.find();
-    const countNotif = notif.length;
-    res.send({notifications : countNotif});
+    const countNotif = notif.length
+    res.json({notifications : countNotif});
     } catch (err) {
       res.status(500).json({ message: err.message }) 
       }
@@ -191,12 +221,12 @@ exports.countReservation = async (req, res) => {
 exports.countTransaction = async (req, res) => {
   try {
         const reserv = await Reservation.find();
-        const countReservation = reserv.length
+        const countReserv = reserv.length
         const colis = await Colis.find();
-        const countColis = colis.length
-        const travel = await Travel.find();
-        const countTravel = travel.length
-        let total = countReservation + countColis + countTravel;
+        const countCol = colis.length
+        const travel = await Reservations.find();
+        const countTrav = travel.length
+        const total = countReserv + countCol + countTrav
         res.json({Transactions : total})
         }
         catch (err) {
@@ -218,7 +248,7 @@ exports.everyUserInfo = async (req, res) =>{
 
 exports.everyTravelInfo = async (req, res) =>{
   try{
-    let travels = await Travel.find()
+    let travels = await Reservations.find()
     .select('phone nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
     .sort({datePay:-1})
     res.send(travels)
@@ -237,7 +267,7 @@ exports.getTravelInfoByTel = async (req, res) => {
 
     if (user) {
       // Si l'utilisateur existe, recherchez les voyages associés à ce numéro de téléphone.
-      const travels = await Travel.find({ phone})
+      const travels = await Reservations.find({ phone})
         .select('phone nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
         .sort({ datePay: -1 });
 
@@ -604,7 +634,7 @@ exports.createTravel = async (req, res) => {
     codeExpiration.setMinutes(codeExpiration.getMinutes() + 6); // Code expires in 15 minutes
 
     // Create a new user document
-    const newTravel = new Travel({
+    const newTravel = new Reservations({
      phone: "+225" + phone,
       nombre_place,
       heure_depart,
@@ -635,7 +665,6 @@ exports.createTravel = async (req, res) => {
   }
 };
 
-
 exports.dataTravel = async (req,res) => {
   try{
     if (req.params.year) {
@@ -643,13 +672,13 @@ exports.dataTravel = async (req,res) => {
       const selectedYear = parseInt(req.params.year, 10);
       const startDate = new Date(selectedYear, 0, 1);
       const endDate = new Date(selectedYear, 11, 31, 23, 59, 59);
-      const data = await Travel.find({
+      const data = await Reservations.find({
         datePay: { $gte: startDate, $lte: endDate },
       });
       res.json(data);
       } else {
         //Obtenir des années distinctes
-        const years = await Travel.distinct('datePay', { datePay: { $ne: null } })
+        const years = await Reservations.distinct('datePay', { datePay: { $ne: null } })
         .then((dates) =>
           dates.map((date) => new Date(date).getFullYear())
         );
@@ -660,6 +689,29 @@ exports.dataTravel = async (req,res) => {
       };
 }
 
+exports.dataReservation = async (req, res) => {
+  try {
+    if (req.params.year) {
+      // Obtenir des données pour une année donnée
+      const selectedYear = parseInt(req.params.year, 10);
+      const startDate = new Date(selectedYear, 0, 1);
+      const endDate = new Date(selectedYear, 11, 31, 23, 59, 59);
+      const data = await Reservation.find({
+        datePay: { $gte: startDate, $lte: endDate },
+      });
+      res.json(data);
+    } else {
+      // Obtenir des années distinctes
+      const distinctYears = await Reservations.distinct('datePay', { datePay: { $ne: null } });
+      const years = distinctYears.map((date) => new Date(date).getFullYear());
+      const uniqueYears = [...new Set(years)];
+      res.json(uniqueYears);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Une erreur est survenue lors du traitement de la demande.' });
+  }
+}; 
 
 exports.createColis = async (req, res) => {
   try {
@@ -712,8 +764,6 @@ exports.createColis = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-
-
 
 exports.loginPass = async (req, res) => {
   try {
@@ -817,7 +867,56 @@ exports.Reservation = async (req, res) => {
   }
 }
 
+{/* //Code pour compter le nombre de places vendus
+exports.dataReservation = async (req, res) => {
+  try {
+    if (req.params.year) {
+      // Obtenir des données pour une année donnée
+      const selectedYear = parseInt(req.params.year, 10);
+      const startDate = new Date(selectedYear, 0, 1);
+      const endDate = new Date(selectedYear, 11, 31, 23, 59, 59);
+      const data = await Reservation.find({
+        datePay: { $gte: startDate, $lte: endDate },
+      });
+      res.json(data);
+    } else {
+      // Obtenir des années distinctes
+      const distinctYears = await Reservations.distinct('datePay', { datePay: { $ne: null } });
+      const years = distinctYears.map((date) => new Date(date).getFullYear());
+      const uniqueYears = [...new Set(years)];
+      res.json(uniqueYears);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Une erreur est survenue lors du traitement de la demande.' });
+  }
+}; 
 
+//Compter les voyages (nombre de place)
+exports.dataTravel = async (req,res) => {
+  try{
+    if (req.params.year) {
+      // Obtenir des données pour une année donnée
+      const selectedYear = parseInt(req.params.year, 10);
+      const startDate = new Date(selectedYear, 0, 1);
+      const endDate = new Date(selectedYear, 11, 31, 23, 59, 59);
+      const data = await Reservations.find({
+        datePay: { $gte: startDate, $lte: endDate },
+      });
+      res.json(data);
+      } else {
+        //Obtenir des années distinctes
+        const years = await Reservations.distinct('datePay', { datePay: { $ne: null } })
+        .then((dates) =>
+          dates.map((date) => new Date(date).getFullYear())
+        );
+        res.json([...new Set(years)]);
+        };
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      };
+}
+*/}
 
 
 

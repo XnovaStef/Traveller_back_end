@@ -143,11 +143,6 @@ exports.countCompany = async (req, res) => {
   }
 };
 
-
-
-
-
-
 exports.getCompanyById = async (req, res) => {
   try {
     const company = await Company.findById(req.params.id);
