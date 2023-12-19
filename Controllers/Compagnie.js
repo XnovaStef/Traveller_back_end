@@ -186,7 +186,7 @@ exports.everyCompanyInfo = async (req, res) => {
 exports.getAllDestinationTravel = async (req, res) => {
   try{
     let company = await Company.find()
-    .select('destinationTravel dateAdded compagnie')
+    .select('destinationTravel dateAdded compagnie tarifTravel gareTravel destinationColis TarifColis gareColis depart')
     .sort({dateAdded:-1})
     res.send(company)
     }catch(e){

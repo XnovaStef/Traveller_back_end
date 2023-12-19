@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 // Modèle de données pour les paiements
 const TravelSchema = new mongoose.Schema({
-phone: {
+tel: {
     type: String,
     required: true,
   },
@@ -37,6 +38,11 @@ nature: {
   gare: {
     type: String,
     required: true,
+  },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User', // Assurez-vous que c'est le même que le modèle d'utilisateur que vous avez défini
+    required: true
   },
   datePay: {
     type: Date,

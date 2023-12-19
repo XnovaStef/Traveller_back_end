@@ -45,7 +45,7 @@ const countStatistics = require('../xnova_back_end/routes/UserRoute');
 const deleteUser = require('../xnova_back_end/routes/UserRoute');
 const  countStatisticsByCompany = require('../xnova_back_end/routes/UserRoute');
 const rankingCompany = require('../xnova_back_end/routes/UserRoute');
-//const  getUserByTel = require('../xnova_back_end/routes/UserRoute');
+const   getTravelsByUser = require('../xnova_back_end/routes/UserRoute');
 
 
 
@@ -109,7 +109,7 @@ app.use('/api', AdminLogin);
 app.use('/api', getTravelInfoByTel );
 app.use('/api', getColisInfoByTel );
 app.use('/api', getReservInfoByTel );
-//app.use('/api',  getUserByTel );
+app.use('/api',   getTravelsByUser );
 app.use('/api', countStatistics);
 app.use('/api', deleteUser);
 app.use('api',  countStatisticsByCompany)

@@ -31,7 +31,8 @@ const {
   getUserByTel,
   countStatistics,
   countStatisticsByCompany,
-  rankingCompany
+  rankingCompany,
+  getTravelsByUser
 
 } = require('../Controllers/User');
 
@@ -55,24 +56,23 @@ router.get('/rankingCompany', rankingCompany);
 router.get('/everyNotifInfo', everyNotifInfo);
 router.get('/dataTravel/:year?', dataTravel);
 router.get('/dataReservation/:year?', dataReservation);
-//router.delete('/deleteUserbyID/:id?', deleteUserbyID);
 router.delete('/deleteUser', deleteUser);
 router.get('/statistics', countStatistics);
-//router.get('/user/:id',  getUserByTel);
+
 
 
 
 // Routes pour les paiements de voyage
 router.post('/Travel', createTravel);
 router.post('/LoginPass', loginPass);
-router.post('/Colis', createColis);
 router.get('/getTravelInfoTel', getTravelInfoByTel);
 router.get('/getColisInfoTel', getColisInfoByTel);
 router.get('/getReservInfoTel', getReservInfoByTel);
+router.get('/users/travels/:userId',  getTravelsByUser);
 router.get('/companyStatistics',  countStatisticsByCompany)
 
 // Routes pour les paiements de colis
-
+router.post('/Colis', createColis);
 
 // Routes pour les réservations
 router.post('/reservation', Reservation);

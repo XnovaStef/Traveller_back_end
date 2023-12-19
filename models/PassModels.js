@@ -3,7 +3,7 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 // Define the User schema
 const PassSchema = new mongoose.Schema({
-phone: {
+tel: {
     type: String,
     required: true,
   },

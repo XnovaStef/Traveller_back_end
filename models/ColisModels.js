@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // Modèle de données pour les paiements
 const ColisSchema = new mongoose.Schema({
-phone: {
+tel: {
     type: String,
     required: true,
   },
