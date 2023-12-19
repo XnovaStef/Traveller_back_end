@@ -104,7 +104,7 @@ app.use('/api', deleteUserbyID);
 app.use('/api', deleteCompanybyID);
 app.use('/api', dataTravel);
 app.use('/api', dataReservation);
-app.use('/api/', Admin);
+app.use('/api', Admin);
 app.use('/api', AdminLogin);
 app.use('/api', getTravelInfoByTel );
 app.use('/api', getColisInfoByTel );
