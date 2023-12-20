@@ -1,27 +1,20 @@
+// Imports
 const express = require('express');
 const mongoose = require('mongoose');
-const UserModels = require('./routes/UserRoute');
-const userLogin = require('../xnova_back_end/routes/UserRoute')
-const registerCompany = require('../xnova_back_end/routes/CompanyRoutes')
-const loginCompany = require('../xnova_back_end/routes/CompanyRoutes')
-const modifyUserName = require('../xnova_back_end/routes/UserRoute')
-const modifyUserPassword = require('../xnova_back_end/routes/UserRoute')
-const modifyCompanyName = require('../xnova_back_end/routes/CompanyRoutes')
-const modifyCompanyEmail = require('../xnova_back_end/routes/CompanyRoutes')
-const modifyCompanyPassword = require('../xnova_back_end/routes/CompanyRoutes')
-const makeDeletionRequest = require('../xnova_back_end/routes/UserRoute')
-const companyDeletionRequest = require('../xnova_back_end/routes/CompanyRoutes')
-const ForgotPassword  = require('../xnova_back_end/routes/UserRoute');
-const ForgotCompanyPassword  = require('../xnova_back_end/routes/CompanyRoutes')
-const createTravel = require('../xnova_back_end/routes/UserRoute')
-const createColis = require('../xnova_back_end/routes/UserRoute')
-const loginPass = require('../xnova_back_end/routes/UserRoute')
-const countUsers = require('../xnova_back_end/routes/UserRoute')
-const countCompany = require('../xnova_back_end/routes/CompanyRoutes')
-const Reservation = require('../xnova_back_end/routes/UserRoute')
-const cors = require('cors'); 
+const cors = require('cors');
+
+// Routes for User Management
+const userRoutes = require('../xnova_back_end/routes/UserRoute');
+const userLogin = require('../xnova_back_end/routes/UserRoute');
+const modifyUserName = require('../xnova_back_end/routes/UserRoute');
+const modifyUserPassword = require('../xnova_back_end/routes/UserRoute');
+const makeDeletionRequest = require('../xnova_back_end/routes/UserRoute');
+const ForgotPassword = require('../xnova_back_end/routes/UserRoute');
+const createTravel = require('../xnova_back_end/routes/UserRoute');
+const createColis = require('../xnova_back_end/routes/UserRoute');
+const loginPass = require('../xnova_back_end/routes/UserRoute');
+const Reservation = require('../xnova_back_end/routes/UserRoute');
 const everyUserInfo = require('../xnova_back_end/routes/UserRoute');
-const everyCompanyInfo = require('../xnova_back_end/routes/CompanyRoutes');
 const everyReservationInfo = require('../xnova_back_end/routes/UserRoute');
 const everyTravelInfo = require('../xnova_back_end/routes/UserRoute');
 const everyColisInfo = require('../xnova_back_end/routes/UserRoute');
@@ -29,28 +22,37 @@ const countReservation = require('../xnova_back_end/routes/UserRoute');
 const countNotifs = require('../xnova_back_end/routes/UserRoute');
 const everyNotifInfo = require('../xnova_back_end/routes/UserRoute');
 const deleteUserbyID = require('../xnova_back_end/routes/UserRoute');
-const deleteCompanybyID = require('../xnova_back_end/routes/CompanyRoutes');
 const countTransaction = require('../xnova_back_end/routes/UserRoute');
 const dataTravel = require('../xnova_back_end/routes/UserRoute');
-const dataReservation= require('../xnova_back_end/routes/UserRoute');
-const Admin = require('../xnova_back_end/routes/AdminRoutes')
-const forgotAdmin = require('../xnova_back_end/routes/AdminRoutes')
-const AdminLogin = require('../xnova_back_end/routes/AdminRoutes');
-const getAllDestinationTravel = require('../xnova_back_end/routes/CompanyRoutes');
-//const { getAllDestinationTravel } = require('./Controllers/Compagnie');
-const   getTravelInfoByTel = require('../xnova_back_end/routes/UserRoute');
-const   getColisInfoByTel = require('../xnova_back_end/routes/UserRoute');
-const   getReservInfoByTel = require('../xnova_back_end/routes/UserRoute');
+const dataReservation = require('../xnova_back_end/routes/UserRoute');
+const getTravelInfoByTel = require('../xnova_back_end/routes/UserRoute');
+const getColisInfoByTel = require('../xnova_back_end/routes/UserRoute');
+const getReservInfoByTel = require('../xnova_back_end/routes/UserRoute');
 const countStatistics = require('../xnova_back_end/routes/UserRoute');
 const deleteUser = require('../xnova_back_end/routes/UserRoute');
-const  countStatisticsByCompany = require('../xnova_back_end/routes/UserRoute');
 const rankingCompany = require('../xnova_back_end/routes/UserRoute');
-const   getTravelsByUser = require('../xnova_back_end/routes/UserRoute');
+const getTravelsByUser = require('../xnova_back_end/routes/UserRoute');
 
+// Routes for Company Management
+const registerCompany = require('../xnova_back_end/routes/CompanyRoutes');
+const loginCompany = require('../xnova_back_end/routes/CompanyRoutes');
+const modifyCompanyName = require('../xnova_back_end/routes/CompanyRoutes');
+const modifyCompanyEmail = require('../xnova_back_end/routes/CompanyRoutes');
+const modifyCompanyPassword = require('../xnova_back_end/routes/CompanyRoutes');
+const companyDeletionRequest = require('../xnova_back_end/routes/CompanyRoutes');
+const ForgotCompanyPassword = require('../xnova_back_end/routes/CompanyRoutes');
+const countCompany = require('../xnova_back_end/routes/CompanyRoutes');
+const everyCompanyInfo = require('../xnova_back_end/routes/CompanyRoutes');
+const getAllDestinationTravel = require('../xnova_back_end/routes/CompanyRoutes');
+const deleteCompanybyID = require('../xnova_back_end/routes/CompanyRoutes');
+const countStatisticsByCompany = require('../xnova_back_end/routes/CompanyRoutes');
 
+// Routes for Admin Management
+const Admin = require('../xnova_back_end/routes/AdminRoutes');
+const forgotAdmin = require('../xnova_back_end/routes/AdminRoutes');
+const AdminLogin = require('../xnova_back_end/routes/AdminRoutes');
 
-
-
+// Express app setup
 const app = express();
 
 // Enable CORS for all routes
@@ -69,51 +71,57 @@ mongoose
   .catch(error => console.error('MongoDB connection error:', error));
 
 // Define API routes
-app.use('/api', UserModels);
-app.use('/api', countUsers);
-app.use('/api', everyUserInfo);
-app.use('/api', userLogin);
-app.use('/api', forgotAdmin );
-app.use('/api',registerCompany);
-app.use('/api', countCompany);
-app.use('/api', everyCompanyInfo);
-app.use('/api', getAllDestinationTravel);
-app.use('/api/company',loginCompany);
-app.use('/api',modifyUserName);
-app.use('/api',modifyUserPassword);
-app.use('/api',modifyCompanyName);
-app.use('/api',modifyCompanyEmail);
-app.use('/api', modifyCompanyPassword);
-app.use('/api',  makeDeletionRequest);
-app.use('/api', companyDeletionRequest);
-app.use('/api', ForgotPassword );  
-app.use('/api', ForgotCompanyPassword  );
-app.use('/api/user', createTravel  );
-app.use('/api/user', createColis);
-app.use('/api/user', loginPass  );
-app.use('/api/user', Reservation  );
-app.use('/api', everyReservationInfo);
-app.use('/api', everyTravelInfo);
-app.use('/api', everyColisInfo);
-app.use('/api', countReservation);
-app.use('/api', countNotifs);
-app.use('/api', countTransaction);
-app.use('/api', rankingCompany);
-app.use('/api', everyNotifInfo);
-app.use('/api', deleteUserbyID);
-app.use('/api', deleteCompanybyID);
-app.use('/api', dataTravel);
-app.use('/api', dataReservation);
-app.use('/api', Admin);
-app.use('/api', AdminLogin);
-app.use('/api', getTravelInfoByTel );
-app.use('/api', getColisInfoByTel );
-app.use('/api', getReservInfoByTel );
-app.use('/api',   getTravelsByUser );
-app.use('/api', countStatistics);
-app.use('/api', deleteUser);
-app.use('/api',  countStatisticsByCompany)
+// User Management
+app.use('/api/user', [
+  userRoutes,
+  userLogin,
+  modifyUserName,
+  modifyUserPassword,
+  makeDeletionRequest,
+  ForgotPassword,
+  createTravel,
+  createColis,
+  loginPass,
+  Reservation,
+  everyUserInfo,
+  everyReservationInfo,
+  everyTravelInfo,
+  everyColisInfo,
+  countReservation,
+  countNotifs,
+  everyNotifInfo,
+  deleteUserbyID,
+  countTransaction,
+  dataTravel,
+  dataReservation,
+  getTravelInfoByTel,
+  getColisInfoByTel,
+  getReservInfoByTel,
+  countStatistics,
+  deleteUser,
+  countStatisticsByCompany,
+  rankingCompany,
+  getTravelsByUser,
+]);
 
+// Company Management
+app.use('/api/company', [
+  registerCompany,
+  loginCompany,
+  modifyCompanyName,
+  modifyCompanyEmail,
+  modifyCompanyPassword,
+  companyDeletionRequest,
+  ForgotCompanyPassword,
+  countCompany,
+  everyCompanyInfo,
+  getAllDestinationTravel,
+  deleteCompanybyID,
+  countStatisticsByCompany,
+]);
+
+// Admin Management
+app.use('/api/admin', [Admin, forgotAdmin, AdminLogin]);
 
 // Start the Express server
 const PORT = process.env.PORT || 3000;
