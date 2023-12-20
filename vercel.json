@@ -2,8 +2,20 @@
     "version": 2,
     "routes": [
       {
-        "src": "/(.*)",
-        "dest": "/App.js" 
+        "src": "/api/user/(.*)",
+        "dest": "/xnova_back_end/routes/UserRoutes/$1"
+      },
+      {
+        "src": "/api/company/(.*)",
+        "dest": "/xnova_back_end/routes/CompanyRoutes/$1"
+      },
+      {
+        "src": "/api/admin/(.*)",
+        "dest": "/xnova_back_end/routes/AdminRoutes/$1"
+      },
+      {
+        "src": "/api/(.*)",
+        "dest": "/xnova_back_end/routes/$1"
       }
     ]
   }
