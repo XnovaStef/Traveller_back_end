@@ -744,7 +744,8 @@ exports.createTravel = async (req, res) => {
     // Generate a random digit code (temporary password) with an expiration time
     const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
     const codeExpiration = new Date();
-    codeExpiration.setMinutes(codeExpiration.getMinutes() + 6); // Code expires in 15 minutes
+    codeExpiration.setHours(codeExpiration.getHours() + 24); // Code expires in 24 hours
+
 
     // Create a new user document
     const newTravel = new Reservations({
