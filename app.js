@@ -123,10 +123,6 @@ app.use('/api/company', [
 // Admin Management
 app.use('/api/admin', [Admin, forgotAdmin, AdminLogin]);
 
-// Start the Express server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+
 
 module.exports = app;
