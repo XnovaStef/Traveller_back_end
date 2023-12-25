@@ -354,8 +354,10 @@ exports.everyNotifInfo = async (req,res) => {
 }
 
 exports.everyColisInfo = async (req, res) =>{
+
+  const { tel } = req.params; // Assuming tel is provided as a parameter in the request
   try{
-    let colis = await Colis.find()
+    let colis = await Colis.find({ tel })
     .select('tel valeur_colis tel_destinataire compagnie destination montant code gare datePay nature timePay')
     .sort({datePay:-1})
     res.send(colis)
@@ -366,8 +368,10 @@ exports.everyColisInfo = async (req, res) =>{
 }
 
 exports.everyReservationInfo = async (req,res) => {
+
+  const { tel } = req.params; // Assuming tel is provided as a parameter in the request
   try{
-    let reservation = await Reservation.find()
+    let reservation = await Reservation.find({ tel })
     .select('tel nombre_place heure_depart destination compagnie gare code datePay nature timePay')
     .sort({dateReserv:-1})
     res.send(reservation)
@@ -462,29 +466,33 @@ exports.everyUserInfo = async (req, res) =>{
       }
 }
 
-exports.everyTravelInfo = async (req, res) =>{
-  try{
-    let travels = await Reservations.find()
-    .select('phone nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
-    .sort({datePay:-1})
-    res.send(travels)
-    }catch(e){
-      console.log(e)
-      res.status(500).json({message:'Error when getting all Travels Info'});
-      }
-}
+exports.everyTravelInfo = async (req, res) => {
+  const { tel } = req.params; // Assuming tel is provided as a parameter in the request
+  
+  try {
+    let travels = await Reservations.find({ tel }) // Filter by tel
+      .select('tel nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
+      .sort({ dateReserv: -1 });
+
+    res.send(travels);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Erreur lors de la récupération des réservations' });
+  }
+};
+
 
 exports.getTravelInfoByTel = async (req, res) => {
-  const { phone } = req.body; // Assurez-vous que vous avez configuré votre route pour inclure le paramètre "tel" dans l'URL.
+  const { tel } = req.body; // Assurez-vous que vous avez configuré votre route pour inclure le paramètre "tel" dans l'URL.
 
   try {
     // Vérifiez d'abord si le numéro de téléphone existe dans la base de données.
-    const user = await User.findOne({ tel }); // Assurez-vous d'adapter ceci en fonction du modèle utilisateur de votre base de données.
+    const userCode = await Pass.findOne({ tel }); // Assurez-vous d'adapter ceci en fonction du modèle utilisateur de votre base de données.
 
-    if (user) {
+    if (userCode) {
       // Si l'utilisateur existe, recherchez les voyages associés à ce numéro de téléphone.
-      const travels = await Reservations.find({ phone})
-        .select('phone nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
+      const travels = await Reservations.find({ tel})
+        .select('tel nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
         .sort({ datePay: -1 });
 
       res.send(travels);
@@ -696,8 +704,8 @@ exports.dataReservation = async (req, res) => {
 
 exports.loginPass = async (req, res) => {
   try {
-    // Extract the code from the request body
-    const { code } = req.body;
+    // Extract code and phone number from the request body
+    const { code, tel } = req.body;
 
     // Find the corresponding pass (code) in the Pass collection
     const pass = await Pass.findOne({ code });
@@ -712,6 +720,11 @@ exports.loginPass = async (req, res) => {
       return res.status(401).json({ message: 'Code expiré' });
     }
 
+    // Check if the phone number matches the stored phone number (if stored)
+    if (pass.tel !== tel) {
+      return res.status(401).json({ message: 'Numéro de téléphone incorrect' });
+    }
+
     // Generate a JWT token for authentication
     const token = jwt.sign({ passId: pass._id }, 'your-secret-key'); // Replace with your secret key
 
@@ -721,6 +734,7 @@ exports.loginPass = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
                                           // CREATION DE TRANSCATION
 
 exports.createTravel = async (req, res) => {
