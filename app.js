@@ -15,9 +15,9 @@ const createColis = require('./routes/UserRoute');
 const loginPass = require('./routes/UserRoute');
 const Reservation = require('./routes/UserRoute');
 const everyUserInfo = require('./routes/UserRoute');
-const everyReservationInfo = require('./routes/UserRoute');
-const everyTravelInfo = require('./routes/UserRoute');
-const everyColisInfo = require('./routes/UserRoute');
+const everyReservationInfoTel = require('./routes/UserRoute');
+const everyTravelInfoTel = require('./routes/UserRoute');
+const everyColisInfoTel = require('./routes/UserRoute');
 const countReservation = require('./routes/UserRoute');
 const countNotifs = require('./routes/UserRoute');
 const everyNotifInfo = require('./routes/UserRoute');
@@ -25,9 +25,6 @@ const deleteUserbyID = require('./routes/UserRoute');
 const countTransaction = require('./routes/UserRoute');
 const dataTravel = require('./routes/UserRoute');
 const dataReservation = require('./routes/UserRoute');
-const getTravelInfoByTel = require('./routes/UserRoute');
-const getColisInfoByTel = require('./routes/UserRoute');
-const getReservInfoByTel = require('./routes/UserRoute');
 const countStatistics = require('./routes/UserRoute');
 const deleteUser = require('./routes/UserRoute');
 const rankingCompany = require('./routes/UserRoute');
@@ -84,9 +81,9 @@ app.use('/api/user', [
   loginPass,
   Reservation,
   everyUserInfo,
-  everyReservationInfo,
-  everyTravelInfo,
-  everyColisInfo,
+  everyReservationInfoTel,
+  everyTravelInfoTel,
+  everyColisInfoTel,
   countReservation,
   countNotifs,
   everyNotifInfo,
@@ -94,9 +91,6 @@ app.use('/api/user', [
   countTransaction,
   dataTravel,
   dataReservation,
-  getTravelInfoByTel,
-  getColisInfoByTel,
-  getReservInfoByTel,
   countStatistics,
   deleteUser,
   countStatisticsByCompany,

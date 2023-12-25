@@ -14,9 +14,12 @@ const {
   countUsers,
   Reservation, 
   everyUserInfo,
-  everyReservationInfo,
-  everyTravelInfo,
+  everyReservationInfoTel,
+  everyTravelInfoTel,
+  everyColisInfoTel,
   everyColisInfo,
+  everyTravelInfo,
+  everyReservationInfo,
   countReservation,
   countNotifs,
   everyNotifInfo,
@@ -24,9 +27,6 @@ const {
   countTransaction,
   dataTravel,
   dataReservation,
-  getTravelInfoByTel,
-  getColisInfoByTel,
-  getReservInfoByTel,
   deleteUser,
   getUserByTel,
   countStatistics,
@@ -46,9 +46,18 @@ router.post('/users/forgot', ForgotPassword);
 router.get('/users/:id', getUserById);
 router.get('/countUsers', countUsers);
 router.get('/everyUserInfo', everyUserInfo);
-router.get('/everyReservationInfo/:tel', everyReservationInfo);
-router.get('/everyTravelInfo/:tel', everyTravelInfo);
-router.get('/everyColisInfo/:tel', everyColisInfo);
+
+// DISPLAY TRANSCATION BY TEL
+router.get('/everyReservationInfoTel/:tel', everyReservationInfoTel);
+router.get('/everyTravelInfoTel/:tel', everyTravelInfoTel);
+router.get('/everyColisInfoTel/:tel', everyColisInfoTel);
+
+// DISPLAY TRANSCATION WITHOUT TEL
+router.get('/everyColisInfo', everyColisInfo);
+router.get('/everyTravelInfo', everyTravelInfo);
+router.get('/everyReservationInfo', everyReservationInfo);
+
+/////////////////////////////////////////////////////////////////
 router.get('/countReservation', countReservation);
 router.get('/countNotifs', countNotifs);
 router.get('/countTransaction', countTransaction);
@@ -65,9 +74,6 @@ router.get('/statistics', countStatistics);
 // Routes pour les paiements de voyage
 router.post('/Travel', createTravel);
 router.post('/LoginPass', loginPass);
-router.get('/getTravelInfoTel', getTravelInfoByTel);
-router.get('/getColisInfoTel', getColisInfoByTel);
-router.get('/getReservInfoTel', getReservInfoByTel);
 router.get('/users/travels/:userId',  getTravelsByUser);
 router.get('/companyStatistics',  countStatisticsByCompany)
 

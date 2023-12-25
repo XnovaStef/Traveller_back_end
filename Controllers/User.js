@@ -353,7 +353,7 @@ exports.everyNotifInfo = async (req,res) => {
       }
 }
 
-exports.everyColisInfo = async (req, res) =>{
+exports.everyColisInfoTel = async (req, res) =>{
 
   const { tel } = req.params; // Assuming tel is provided as a parameter in the request
   try{
@@ -367,7 +367,7 @@ exports.everyColisInfo = async (req, res) =>{
       }
 }
 
-exports.everyReservationInfo = async (req,res) => {
+exports.everyReservationInfoTel = async (req,res) => {
 
   const { tel } = req.params; // Assuming tel is provided as a parameter in the request
   try{
@@ -466,7 +466,7 @@ exports.everyUserInfo = async (req, res) =>{
       }
 }
 
-exports.everyTravelInfo = async (req, res) => {
+exports.everyTravelInfoTel = async (req, res) => {
   const { tel } = req.params; // Assuming tel is provided as a parameter in the request
   
   try {
@@ -481,79 +481,46 @@ exports.everyTravelInfo = async (req, res) => {
   }
 };
 
-
-exports.getTravelInfoByTel = async (req, res) => {
-  const { tel } = req.body; // Assurez-vous que vous avez configuré votre route pour inclure le paramètre "tel" dans l'URL.
-
+exports.everyTravelInfo = async (req, res) => {
+  
   try {
-    // Vérifiez d'abord si le numéro de téléphone existe dans la base de données.
-    const userCode = await Pass.findOne({ tel }); // Assurez-vous d'adapter ceci en fonction du modèle utilisateur de votre base de données.
+    let travels = await Reservations.find() // Filter by tel
+      .select('tel nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
+      .sort({ dateReserv: -1 });
 
-    if (userCode) {
-      // Si l'utilisateur existe, recherchez les voyages associés à ce numéro de téléphone.
-      const travels = await Reservations.find({ tel})
-        .select('tel nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
-        .sort({ datePay: -1 });
-
-      res.send(travels);
-    } else {
-      // Si l'utilisateur n'existe pas, renvoyez un message indiquant qu'aucun utilisateur n'a été trouvé.
-      res.status(404).json({ message: 'Aucun utilisateur avec ce numéro de téléphone trouvé.' });
-    }
+    res.send(travels);
   } catch (e) {
     console.log(e);
-    res.status(500).json({ message: 'Erreur lors de la récupération des informations de voyage.' });
+    res.status(500).json({ message: 'Erreur lors de la récupération des réservations' });
   }
 };
 
-exports.getColisInfoByTel = async (req, res) => {
-  const { phone } = req.body; // Assurez-vous que vous avez configuré votre route pour inclure le paramètre "tel" dans l'URL.
+exports.everyReservationInfo = async (req,res) => {
 
-  try {
-    // Vérifiez d'abord si le numéro de téléphone existe dans la base de données.
-    const user = await User.findOne({ phone }); // Assurez-vous d'adapter ceci en fonction du modèle utilisateur de votre base de données.
+  try{
+    let reservation = await Reservation.find()
+    .select('tel nombre_place heure_depart destination compagnie gare code datePay nature timePay')
+    .sort({dateReserv:-1})
+    res.send(reservation)
+        }catch(e){
+          console.log(e)
+          res.status(500).json({message:'Erreur when getting the reservation'});
+          }
+}
 
-    if (user) {
-      // Si l'utilisateur existe, recherchez les voyages associés à ce numéro de téléphone.
-      const colis = await Colis.find({phone })
-        .select('phone valeur_colis tel_destinataire compagnie destination montant code gare datePay nature timePay')
-        .sort({ datePay: -1 });
-
-      res.send(colis);
-    } else {
-      // Si l'utilisateur n'existe pas, renvoyez un message indiquant qu'aucun utilisateur n'a été trouvé.
-      res.status(404).json({ message: 'Aucun utilisateur avec ce numéro de téléphone trouvé.' });
-    }
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: 'Erreur lors de la récupération des informations de voyage.' });
-  }
-};
+exports.everyColisInfo = async (req, res) =>{
+  try{
+    let colis = await Colis.find()
+    .select('tel valeur_colis tel_destinataire compagnie destination montant code gare datePay nature timePay')
+    .sort({datePay:-1})
+    res.send(colis)
+    }catch(e){
+      console.log(e)
+      res.status(500).json({message:'Error when getting all Colis Info'});
+      }
+}
 
 
-exports.getReservInfoByTel = async (req, res) => {
-  const { phone } = req.body; // Assurez-vous que vous avez configuré votre route pour inclure le paramètre "tel" dans l'URL.
-
-  try {
-    // Vérifiez d'abord si le numéro de téléphone existe dans la base de données.
-    const user = await User.findOne({ phone }); // Assurez-vous d'adapter ceci en fonction du modèle utilisateur de votre base de données.
-
-    if (user) {
-      // Si l'utilisateur existe, recherchez les voyages associés à ce numéro de téléphone.
-      const reserv = await Reservation.find({ phone })
-        .select('phone nombre_place heure_depart heure_validation compagnie destination code gare datePay nature timePay')
-        .sort({ datePay: -1 });
-
-      res.send(reserv);
-    } else {
-      // Si l'utilisateur n'existe pas, renvoyez un message indiquant qu'aucun utilisateur n'a été trouvé.
-      res.status(404).json({ message: 'Aucun utilisateur avec ce numéro de téléphone trouvé.' });
-    }
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: 'Erreur lors de la récupération des informations de voyage.' });
-  }
-};
 
 exports.getTravelsByUser = async (req, res) => {
   try {
