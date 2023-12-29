@@ -887,6 +887,152 @@ exports.Reservation = async (req, res) => {
   }
 }
 
+///////////////////////////////////////// STATISTIQUES PAR JOUR, SEMAINES, Années
+
+
+
+exports.StatsDetail = async (req, res) => {
+  try {
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const startOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+    const startOfYear = new Date(today.getFullYear(), 0, 1);
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    const totalCounts = {
+      reservations: await Reservation.countDocuments({}),
+      colis: await Colis.countDocuments({}),
+      travel: await Reservations.countDocuments({}),
+    };
+
+    const calculatePercentage = (count, total) => {
+      return total > 0 ? (count / total) : 0;
+    };
+
+    const calculateNormalizedPercentage = (percentages) => {
+      const sum = Object.values(percentages).reduce((acc, val) => acc + val, 0);
+      const scaleFactor = sum !== 0 ? 1 / sum : 0;
+
+      for (const key in percentages) {
+        percentages[key] *= scaleFactor;
+      }
+
+      return percentages;
+    };
+
+    let stats = {
+      today: {
+        reservations: calculatePercentage(
+          await Reservation.countDocuments({ datePay: { $gte: startOfDay } }),
+          totalCounts.reservations
+        ),
+        colis: calculatePercentage(
+          await Colis.countDocuments({ datePay: { $gte: startOfDay } }),
+          totalCounts.colis
+        ),
+        travel: calculatePercentage(
+          await Reservations.countDocuments({ datePay: { $gte: startOfDay } }),
+          totalCounts.travel
+        ),
+      },
+      thisWeek: {
+        reservations: calculatePercentage(
+          await Reservation.countDocuments({ datePay: { $gte: startOfWeek } }),
+          totalCounts.reservations
+        ),
+        colis: calculatePercentage(
+          await Colis.countDocuments({ datePay: { $gte: startOfWeek } }),
+          totalCounts.colis
+        ),
+        travel: calculatePercentage(
+          await Reservations.countDocuments({ datePay: { $gte: startOfWeek } }),
+          totalCounts.travel
+        ),
+      },
+      thisMonth: {
+        reservations: calculatePercentage(
+          await Reservation.countDocuments({ datePay: { $gte: startOfMonth } }),
+          totalCounts.reservations
+        ),
+        colis: calculatePercentage(
+          await Colis.countDocuments({ datePay: { $gte: startOfMonth } }),
+          totalCounts.colis
+        ),
+        travel: calculatePercentage(
+          await Reservations.countDocuments({ datePay: { $gte: startOfMonth } }),
+          totalCounts.travel
+        ),
+      },
+      thisYear: {
+        reservations: calculatePercentage(
+          await Reservation.countDocuments({ datePay: { $gte: startOfYear } }),
+          totalCounts.reservations
+        ),
+        colis: calculatePercentage(
+          await Colis.countDocuments({ datePay: { $gte: startOfYear } }),
+          totalCounts.colis
+        ),
+        travel: calculatePercentage(
+          await Reservations.countDocuments({ datePay: { $gte: startOfYear } }),
+          totalCounts.travel
+        ),
+      },
+    };
+
+    // Normalizing percentages
+    stats = {
+      today: calculateNormalizedPercentage(stats.today),
+      thisWeek: calculateNormalizedPercentage(stats.thisWeek),
+      thisMonth: calculateNormalizedPercentage(stats.thisMonth),
+      thisYear: calculateNormalizedPercentage(stats.thisYear),
+    };
+
+    res.status(200).json(stats);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+///////////////////////////////////////// STATISTIQUES PAR JOUR, SEMAINES, Années en entrant des informations
+
+exports.getStats = async (req, res) => {
+  try {
+    const { day, month, year } = req.query;
+
+    const today = new Date();
+    const startDate = new Date(year, month - 1, day);
+    const endDate = new Date(year, month - 1, parseInt(day) + 1);
+
+    console.log('startDate:', startDate.toISOString().split('T')[0]);
+    console.log('endDate:', endDate.toISOString().split('T')[0]);
+
+    const formattedStartDate = startDate.toISOString().split('T')[0];
+    const formattedEndDate = endDate.toISOString().split('T')[0];
+
+    const stats = {
+      selectedPeriod: {
+        reservations: await Reservation.countDocuments({
+          datePay: { $gte: formattedStartDate, $lt: formattedEndDate }
+        }),
+        colis: await Colis.countDocuments({
+          datePay: { $gte: formattedStartDate, $lt: formattedEndDate }
+        }),
+        travel: await Reservations.countDocuments({
+          datePay: { $gte: formattedStartDate, $lt: formattedEndDate }
+        }),
+      },
+    };
+
+    res.status(200).json(stats);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+
+
 {/* //Code pour compter le nombre de places vendus
 exports.dataReservation = async (req, res) => {
   try {

@@ -32,7 +32,9 @@ const {
   countStatistics,
   countStatisticsByCompany,
   rankingCompany,
-  getTravelsByUser
+  getTravelsByUser,
+  StatsDetail,
+  getStats
 
 } = require('../Controllers/User');
 
@@ -68,7 +70,10 @@ router.get('/dataReservation/:year?', dataReservation);
 router.delete('/deleteUser', deleteUser);
 router.get('/statistics', countStatistics);
 
+///////////////////////////////////////////////////////////////// DISPLAY STATISTIQUES PAR JOUR, SEMAINES,ANNEES
 
+router.get('/getStats', StatsDetail);
+router.get('/stats', getStats);
 
 
 // Routes pour les paiements de voyage
