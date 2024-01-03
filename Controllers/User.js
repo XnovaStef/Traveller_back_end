@@ -11,6 +11,21 @@ const { now } = require('mongoose');
 const Reservation = require('../models/ReservModels');
 //const crypto = require('crypto');
 const moment = require('moment');
+const twilio = require('twilio');
+//const sendSMS = require('../Controllers/testSms')
+
+// Remplace ces valeurs par tes propres identifiants Twilio
+const accountSid = 'ACb139d361d02b3c567685d69dc09594da';
+const authToken = 'ac6f71833b4a4c0627677d8b36c3db43';
+const client = twilio(accountSid, authToken);
+
+const { Vonage } = require('@vonage/server-sdk');
+
+// Initialise Vonage
+const vonage = new Vonage({
+  apiKey: "0d5dd3ec",
+  apiSecret: "3vQStC3i1VFexes7"
+});
 
 
                                                           // REGISTER USERS
@@ -815,8 +830,9 @@ exports.createColis = async (req, res) => {
 
 exports.Reservation = async (req, res) => {
   try {
-    // Récupérez les informations de la réservation à partir de la requête
-    const {tel, nombre_place, heure_depart, compagnie, destination, gare } = req.body;
+    const { tel, nombre_place, heure_depart, compagnie, destination, gare } = req.body;
+
+    // Votre validation d'utilisateur existant ici...
 
     const existingUser = await User.findOne({ tel });
 
@@ -824,7 +840,9 @@ exports.Reservation = async (req, res) => {
       return res.status(400).json({ message: 'Paiement non effectué, numéro de téléphone incorrect' });
     }
 
-    // Créez une date avec l'heure et les minutes spécifiées et le fuseau horaire de la Côte d'Ivoire (UTC+0)
+    const formattedTel = tel.replace('+', ''); // Retire le préfixe "+"
+    const formattedTo = formattedTel.startsWith('225') ? formattedTel : `225${formattedTel}`;
+
     const heureDepartParts = heure_depart.split(':');
     if (heureDepartParts.length !== 2) {
       return res.status(400).json({ message: 'Format d\'heure de départ invalide. Utilisez hh:mm.' });
@@ -832,60 +850,86 @@ exports.Reservation = async (req, res) => {
     const hours = parseInt(heureDepartParts[0], 10);
     const minutes = parseInt(heureDepartParts[1], 10);
 
-    if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours >= 24 || minutes < 0 || minutes >= 60) {
-      return res.status(400).json({ message: 'Heure de départ invalide.' });
-    }
-
-    // Créez une nouvelle date avec l'heure et les minutes spécifiées et le fuseau horaire de la Côte d'Ivoire (UTC+0)
     const heure_depart_date = new Date();
     heure_depart_date.setUTCHours(hours);
     heure_depart_date.setUTCMinutes(minutes);
 
-    // Calculez la valeur de heure_validation en ajoutant 24 heures à dateReserv
-    const dateReserv = new Date(); // Obtenez la date et l'heure actuelles
+    const dateReserv = new Date();
     const heure_validation = new Date(dateReserv);
-    heure_validation.setUTCDate(heure_validation.getUTCDate() + 1); // Ajoute 24 heures
+    heure_validation.setUTCDate(heure_validation.getUTCDate() + 1);
 
-    // Generate a random digit code (temporary password) with an expiration time
     const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
     const codeExpiration = new Date();
-    codeExpiration.setMinutes(codeExpiration.getMinutes() + 15); // Code expires in 15 minutes
+    codeExpiration.setHours(codeExpiration.getHours() + 24);
 
-    // Automatically determine the 'nature' field value based on the presence of 'heure_validation'
-    const nature = heure_validation ? 'reservation' : 'paiement';
+    /*const message = `Votre code de réservation est : ${digitCode}. Valide jusqu'à ${codeExpiration.toLocaleTimeString()}.`;
 
-    // Créez une nouvelle instance de Reservation avec les informations fournies
+    const from = 'Vonage APIs';
+
+    const sendSMS = async () => {
+      return new Promise((resolve, reject) => {
+        vonage.message.sendSms(from, `+${formattedTo}`, message, (err, responseData) => {
+          if (err) {
+            console.error('Erreur lors de l\'envoi du SMS :', err);
+            reject(err);
+          } else {
+            console.log('Message envoyé avec succès :', responseData);
+            resolve(responseData);
+          }
+        });
+      });
+    };
+
+    await sendSMS();*/
+
     const newReservation = new Reservation({
-      tel :tel,
+      tel,
       nombre_place,
       heure_depart: heure_depart_date,
       heure_validation,
       compagnie,
-      code: digitCode, // Store the hashed password
-      codeExpiration, // Store code expiration time
+      code: digitCode,
+      codeExpiration,
       destination,
       gare,
-      nature, // Automatically set the 'nature' field
-      datePay: new Date(), // Set the 'datePay' field to the current date and time
-      timePay: new Date().toLocaleTimeString(), // Set the 'timePay' field to the current time
+      nature: heure_validation ? 'reservation' : 'paiement',
+      datePay: new Date(),
+      timePay: new Date().toLocaleTimeString(),
     });
 
-    // Enregistrez la réservation dans la base de données
     const reservationEnregistree = await newReservation.save();
 
-    // Save the code and tel in the "Pass" collection
     const newPass = new Pass({ tel, code: digitCode, codeExpiration });
     await newPass.save();
 
-    // Create and send a JWT token for authentication
-    const token = jwt.sign({ codeId: newReservation._id }, 'your-secret-key'); // Replace with your secret key
+    const token = jwt.sign({ codeId: newReservation._id }, 'your-secret-key');
+
     res.status(201).json({ message:  `Réservation enregistrée avec succès, veuillez vous présenter avant ${heure_validation.toISOString()}`, token });
 
   } catch (error) {
-    // Gérez les erreurs appropriées ici
     res.status(500).json({ message: error.message });
   }
 }
+
+exports.afficherDernierCodeEnregistre = async (req, res) => {
+  try {
+    // Récupère le dernier code enregistré avec son codeExpiration associé
+    const dernierCode = await Pass.findOne({}, 'code codeExpiration').sort({ _id: -1 });
+
+    if (!dernierCode) {
+      return res.status(404).json({ message: 'Aucun code enregistré.' });
+    }
+
+    // Formate la date du codeExpiration pour ne conserver que la date (sans l'heure)
+    const codeExpirationDate = dernierCode.codeExpiration.toISOString().split('T')[0];
+
+    res.status(200).json({ dernierCode: { code: dernierCode.code, codeExpiration: codeExpirationDate } });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
 
 ///////////////////////////////////////// STATISTIQUES PAR JOUR, SEMAINES, Années
 

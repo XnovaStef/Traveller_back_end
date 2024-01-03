@@ -34,7 +34,8 @@ const {
   rankingCompany,
   getTravelsByUser,
   StatsDetail,
-  getStats
+  getStats,
+  afficherDernierCodeEnregistre
 
 } = require('../Controllers/User');
 
@@ -87,5 +88,9 @@ router.post('/Colis', createColis);
 
 // Routes pour les réservations
 router.post('/reservation', Reservation);
+
+// Routes pour afficher dernier code généré
+
+router.get('/lastcode', afficherDernierCodeEnregistre)
 
 module.exports = router;
