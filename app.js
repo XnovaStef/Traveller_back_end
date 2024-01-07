@@ -22,6 +22,9 @@ const everyReservationInfoTelCode = require('./routes/UserRoute');
 const everyTravelInfoTelCode = require('./routes/UserRoute');
 const everyColisInfoTelCode = require('./routes/UserRoute');
 const countReservation = require('./routes/UserRoute');
+const everyColisInfo = require('./routes/UserRoute')
+const everyTravelInfo = require('./routes/UserRoute')
+const everyReservationInfo = require('./routes/UserRoute')
 const countNotifs = require('./routes/UserRoute');
 const everyNotifInfo = require('./routes/UserRoute');
 const deleteUserbyID = require('./routes/UserRoute');
@@ -93,6 +96,9 @@ app.use('/api/user', [
   everyReservationInfoTelCode,
   everyTravelInfoTelCode,
   everyColisInfoTelCode,
+  everyTravelInfo,
+  everyColisInfo,
+  everyReservationInfo,
   countReservation,
   countNotifs,
   everyNotifInfo,

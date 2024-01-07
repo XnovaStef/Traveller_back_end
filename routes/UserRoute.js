@@ -38,7 +38,7 @@ const {
   afficherDernierCodeEnregistre,
   everyReservationInfoTelCode,
   everyTravelInfoTelCode,
-  everyColisInfoTelCode
+  everyColisInfoTelCode,
 
 } = require('../Controllers/User');
 
@@ -79,6 +79,7 @@ router.get('/dataTravel/:year?', dataTravel);
 router.get('/dataReservation/:year?', dataReservation);
 router.delete('/deleteUser', deleteUser);
 router.get('/statistics', countStatistics);
+
 
 ///////////////////////////////////////////////////////////////// DISPLAY STATISTIQUES PAR JOUR, SEMAINES,ANNEES
 
