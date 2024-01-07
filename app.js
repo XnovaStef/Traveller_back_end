@@ -18,6 +18,9 @@ const everyUserInfo = require('./routes/UserRoute');
 const everyReservationInfoTel = require('./routes/UserRoute');
 const everyTravelInfoTel = require('./routes/UserRoute');
 const everyColisInfoTel = require('./routes/UserRoute');
+const everyReservationInfoTelCode = require('./routes/UserRoute');
+const everyTravelInfoTelCode = require('./routes/UserRoute');
+const everyColisInfoTelCode = require('./routes/UserRoute');
 const countReservation = require('./routes/UserRoute');
 const countNotifs = require('./routes/UserRoute');
 const everyNotifInfo = require('./routes/UserRoute');
@@ -87,6 +90,9 @@ app.use('/api/user', [
   everyReservationInfoTel,
   everyTravelInfoTel,
   everyColisInfoTel,
+  everyReservationInfoTelCode,
+  everyTravelInfoTelCode,
+  everyColisInfoTelCode,
   countReservation,
   countNotifs,
   everyNotifInfo,

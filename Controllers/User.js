@@ -368,6 +368,64 @@ exports.everyNotifInfo = async (req,res) => {
       }
 }
 
+exports.everyTravelInfoTelCode = async (req, res) => {
+  const { tel, code } = req.params; // Assuming tel is provided as a parameter in the request
+  
+  try {
+    let travels = await Reservations.find({ tel, code }) // Filter by tel
+      .select('tel nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
+      .sort({ dateReserv: -1 });
+
+    res.send(travels);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Erreur lors de la récupération des réservations' });
+  }
+};
+
+exports.everyColisInfoTelCode = async (req, res) =>{
+
+  const { tel, code } = req.params; // Assuming tel is provided as a parameter in the request
+  try{
+    let colis = await Colis.find({ tel, code })
+    .select('tel valeur_colis tel_destinataire compagnie destination montant code gare datePay nature timePay')
+    .sort({datePay:-1})
+    res.send(colis)
+    }catch(e){
+      console.log(e)
+      res.status(500).json({message:'Error when getting all Colis Info'});
+      }
+}
+
+exports.everyReservationInfoTelCode = async (req,res) => {
+
+  const { tel, code } = req.params; // Assuming tel is provided as a parameter in the request
+  try{
+    let reservation = await Reservation.find({ tel, code })
+    .select('tel nombre_place heure_depart destination compagnie gare code datePay nature timePay montant ')
+    .sort({dateReserv:-1})
+    res.send(reservation)
+        }catch(e){
+          console.log(e)
+          res.status(500).json({message:'Erreur when getting the reservation'});
+          }
+}
+
+exports.everyTravelInfoTel = async (req, res) => {
+  const { tel } = req.params; // Assuming tel is provided as a parameter in the request
+  
+  try {
+    let travels = await Reservations.find({ tele }) // Filter by tel
+      .select('tel nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
+      .sort({ dateReserv: -1 });
+
+    res.send(travels);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: 'Erreur lors de la récupération des réservations' });
+  }
+};
+
 exports.everyColisInfoTel = async (req, res) =>{
 
   const { tel } = req.params; // Assuming tel is provided as a parameter in the request
@@ -387,7 +445,7 @@ exports.everyReservationInfoTel = async (req,res) => {
   const { tel } = req.params; // Assuming tel is provided as a parameter in the request
   try{
     let reservation = await Reservation.find({ tel })
-    .select('tel nombre_place heure_depart destination compagnie gare code datePay nature timePay')
+    .select('tel nombre_place heure_depart destination compagnie gare code datePay nature timePay montant ')
     .sort({dateReserv:-1})
     res.send(reservation)
         }catch(e){
@@ -481,20 +539,7 @@ exports.everyUserInfo = async (req, res) =>{
       }
 }
 
-exports.everyTravelInfoTel = async (req, res) => {
-  const { tel } = req.params; // Assuming tel is provided as a parameter in the request
-  
-  try {
-    let travels = await Reservations.find({ tel }) // Filter by tel
-      .select('tel nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
-      .sort({ dateReserv: -1 });
 
-    res.send(travels);
-  } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: 'Erreur lors de la récupération des réservations' });
-  }
-};
 
 exports.everyTravelInfo = async (req, res) => {
   
@@ -904,7 +949,7 @@ exports.Reservation = async (req, res) => {
 
     const token = jwt.sign({ codeId: newReservation._id }, 'your-secret-key');
 
-    res.status(201).json({ message:  `Réservation enregistrée avec succès, veuillez vous présenter avant ${heure_validation.toISOString()}`, token });
+    res.status(201).json({ message:  `Réservation enregistrée avec succès, veuillez vous présenter avant ${heure_validation.toISOString()}`, token,  code: digitCode, codeExpiration });
 
   } catch (error) {
     res.status(500).json({ message: error.message });

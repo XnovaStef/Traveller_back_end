@@ -35,7 +35,10 @@ const {
   getTravelsByUser,
   StatsDetail,
   getStats,
-  afficherDernierCodeEnregistre
+  afficherDernierCodeEnregistre,
+  everyReservationInfoTelCode,
+  everyTravelInfoTelCode,
+  everyColisInfoTelCode
 
 } = require('../Controllers/User');
 
@@ -50,7 +53,11 @@ router.get('/users/:id', getUserById);
 router.get('/countUsers', countUsers);
 router.get('/everyUserInfo', everyUserInfo);
 
-// DISPLAY TRANSCATION BY TEL
+// DISPLAY TRANSCATION BY TEL AND CODE
+router.get('/everyReservationInfoTelCode/:tel/:code', everyReservationInfoTelCode);
+router.get('/everyTravelInfoTelCode/:tel/:code', everyTravelInfoTelCode);
+router.get('/everyColisInfoTelCode/:tel/:code', everyColisInfoTelCode);
+
 router.get('/everyReservationInfoTel/:tel', everyReservationInfoTel);
 router.get('/everyTravelInfoTel/:tel', everyTravelInfoTel);
 router.get('/everyColisInfoTel/:tel', everyColisInfoTel);
