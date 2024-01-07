@@ -58,6 +58,8 @@ router.get('/everyReservationInfoTelCode/:tel/:code', everyReservationInfoTelCod
 router.get('/everyTravelInfoTelCode/:tel/:code', everyTravelInfoTelCode);
 router.get('/everyColisInfoTelCode/:tel/:code', everyColisInfoTelCode);
 
+// DISPLAY TRANSCATION BY TEL 
+
 router.get('/everyReservationInfoTel/:tel', everyReservationInfoTel);
 router.get('/everyTravelInfoTel/:tel', everyTravelInfoTel);
 router.get('/everyColisInfoTel/:tel', everyColisInfoTel);

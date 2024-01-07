@@ -415,7 +415,7 @@ exports.everyTravelInfoTel = async (req, res) => {
   const { tel } = req.params; // Assuming tel is provided as a parameter in the request
   
   try {
-    let travels = await Reservations.find({ tele }) // Filter by tel
+    let travels = await Reservations.find({ tel }) // Filter by tel
       .select('tel nombre_place heure_depart compagnie destination montant code gare datePay nature timePay')
       .sort({ dateReserv: -1 });
 
