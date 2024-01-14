@@ -18,6 +18,7 @@ const twilio = require('twilio');
 const accountSid = 'ACb139d361d02b3c567685d69dc09594da';
 const authToken = 'ac6f71833b4a4c0627677d8b36c3db43';
 const client = twilio(accountSid, authToken);
+const axios = require('axios');
 
 const { Vonage } = require('@vonage/server-sdk');
 
@@ -763,17 +764,52 @@ exports.loginPass = async (req, res) => {
 };
 
                                           // CREATION DE TRANSCATION
+// Function to make payment using CinetPay API
+async function makeCinetPayPayment(paymentData) {
+  try {
+    // Check if "api_key" field is defined before attempting to convert to string
+    if (paymentData.api_key !== undefined) {
+      // Ensure that the "api_key" field is a string
+      paymentData.api_key = paymentData.api_key.toString();
+    } else {
+      console.error('CinetPay API Error: "api_key" is undefined');
+      return { success: false, error: '"api_key" is undefined' };
+    }
+
+    const cinetPayConfig = {
+      method: 'post',
+      url: 'https://api-checkout.cinetpay.com/v2/payment',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: paymentData,
+    };
+
+    const response = await axios(cinetPayConfig);
+
+    // Check if 'data' property exists in the response
+    if (response && response.data) {
+      return { success: true, data: response.data };
+    } else {
+      console.error('CinetPay API Error: Invalid response format');
+      return { success: false, error: 'Invalid response format' };
+    }
+  } catch (error) {
+    console.error('CinetPay API Error:', error.response ? error.response.data : error.message);
+    return { success: false, error: 'Payment failed' };
+  }
+}
 
 exports.createTravel = async (req, res) => {
   try {
     // Extract user data from the request body
-    let {tel, nombre_place, heure_depart, compagnie, destination, montant, gare, heure_validation } = req.body;
+    let { tel, nombre_place, heure_depart, compagnie, destination, montant, gare, heure_validation } = req.body;
 
     // Add "+225" to the beginning of the phone number
     //tel = "+225" + tel;
 
     // Check if a user with the same phone number already exists
-    const existingUser = await User.findOne({tel});
+    const existingUser = await User.findOne({ tel });
 
     if (!existingUser) {
       return res.status(400).json({ message: 'Paiement non effectué, numéro de téléphone incorrect' });
@@ -787,39 +823,65 @@ exports.createTravel = async (req, res) => {
     const codeExpiration = new Date();
     codeExpiration.setHours(codeExpiration.getHours() + 24); // Code expires in 24 hours
 
+    // Prepare payment data for CinetPay
+    const paymentData = {
+      api_key: "51721003965a110f3828750.63222602", // Replace with your actual CinetPay API key
+      site_id: "5867191", // Replace with your actual CinetPay site ID
+      transaction_id: Math.floor(Math.random() * 100000000).toString(),
+      amount: montant, // Assuming 'montant' is the amount from your request
+      currency: "XOF", // Replace with the appropriate currency code
+      description: "Payment for travel", // Replace with your actual description
+      customer_id: existingUser._id,
+      customer_name: "Ble", // Replace with the actual customer name
+      customer_surname: "Stephane", // Replace with the actual customer surname
+      customer_email: "falletkamagate3@gmail.com", // Replace with the actual customer email
+      customer_phone_number: tel,
+      // Add other relevant payment data fields
+    };
 
-    // Create a new user document
-    const newTravel = new Reservations({
-      tel: tel,
-      nombre_place,
-      heure_depart,
-      compagnie,
-      destination,
-      montant,
-      code: digitCode, // Store the hashed password
-      codeExpiration, // Store code expiration time
-      gare,
-      user: existingUser._id,
-      nature, // Automatically set the 'nature' field
-      datePay: new Date(), // Set the 'datePay' field to the current date and time
-      timePay: new Date().toLocaleTimeString(), // Set the 'timePay' field to the current time
-    });
+    // Make CinetPay payment
+    const cinetPayResult = await makeCinetPayPayment(paymentData);
 
-    // Save the user to the database
-    await newTravel.save();
+    // Check the result of the CinetPay payment
+    if (cinetPayResult.success) {
+      // CinetPay payment successful, continue with saving the user and generating JWT token
+      const newTravel = new Reservations({
+        tel: tel,
+        nombre_place,
+        heure_depart,
+        compagnie,
+        destination,
+        montant,
+        code: digitCode,
+        codeExpiration,
+        gare,
+        user: existingUser._id,
+        nature,
+        datePay: new Date(),
+        timePay: new Date().toLocaleTimeString(),
+      });
 
-    // Create and send a JWT token for authentication
-    const token = jwt.sign({ codeId: newTravel._id }, 'your-secret-key'); // Replace with your secret key
-    res.status(201).json({ message: 'Paiement effectué', token });
+      // Save the user to the database
+      await newTravel.save();
 
-    // Save the code and tel in the "Pass" collection
-    const newPass = new Pass({ tel, code: digitCode, codeExpiration });
-    await newPass.save();
+      // Create and send a JWT token for authentication
+      const token = jwt.sign({ codeId: newTravel._id }, 'your-secret-key'); // Replace with your secret key
+      res.status(201).json({ message: 'Paiement effectué', token,  code: digitCode, codeExpiration });
+
+      // Save the code and tel in the "Pass" collection
+      const newPass = new Pass({ tel, code: digitCode, codeExpiration });
+      await newPass.save();
+    } else {
+      // CinetPay payment failed, send an appropriate response
+      return res.status(400).json({ message: 'Paiement CinetPay échoué' });
+    }
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+                                          
 
 exports.createColis = async (req, res) => {
   try {
@@ -841,7 +903,26 @@ exports.createColis = async (req, res) => {
     const codeExpiration = new Date();
     codeExpiration.setMinutes(codeExpiration.getMinutes() + 20); // Code expires in 20 minutes
 
-    // Create a new user document
+    const paymentData = {
+      api_key: "51721003965a110f3828750.63222602", // Replace with your actual CinetPay API key
+      site_id: "5867191", // Replace with your actual CinetPay site ID
+      transaction_id: Math.floor(Math.random() * 100000000).toString(),
+      amount: montant, // Assuming 'montant' is the amount from your request
+      currency: "XOF", // Replace with the appropriate currency code
+      description: "Payment for travel", // Replace with your actual description
+      customer_id: existingUser._id,
+      customer_name: "Ble", // Replace with the actual customer name
+      customer_surname: "Stephane", // Replace with the actual customer surname
+      customer_email: "falletkamagate3@gmail.com", // Replace with the actual customer email
+      customer_phone_number: tel,
+      // Add other relevant payment data fields
+    };
+
+    // Make CinetPay payment
+    const cinetPayResult = await makeCinetPayPayment(paymentData);
+
+    if(cinetPayResult.success){
+      // Create a new user document
     const newColis = new Colis({
       tel: tel,
       valeur_colis,
@@ -862,11 +943,16 @@ exports.createColis = async (req, res) => {
 
     // Create and send a JWT token for authentication
     const token = jwt.sign({ codeId: newColis._id }, 'your-secret-key'); // Replace with your secret key
-    res.status(201).json({ message: 'Paiement effectué', token });
+    res.status(201).json({ message: 'Paiement effectué', token, code: digitCode, codeExpiration  });
 
     // Save the code and tel in the "Pass" collection
     const newPass = new Pass({ tel, code: digitCode, codeExpiration });
     await newPass.save();
+    }  else {
+      // CinetPay payment failed, send an appropriate response
+      return res.status(400).json({ message: 'Paiement CinetPay échoué' });
+    }
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });

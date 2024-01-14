@@ -19,7 +19,7 @@ const CompanySchema = new mongoose.Schema({
     required: true,
   },
   tarifTravel: {
-    type: String,
+    type: Number,
     required: true,
   },
   gareTravel: {
@@ -31,7 +31,7 @@ const CompanySchema = new mongoose.Schema({
     required: true,
   },
   TarifColis: {
-    type: String,
+    type: Number,
     required: true,
   },
   gareColis: {

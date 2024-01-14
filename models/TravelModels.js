@@ -28,7 +28,7 @@ nature: {
     required: true,
   },
   montant: {
-    type: String,
+    type: Number,
     required: true,
   },
   code: {
