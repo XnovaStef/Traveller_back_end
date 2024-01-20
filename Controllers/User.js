@@ -802,11 +802,8 @@ async function makeCinetPayPayment(paymentData) {
 
 exports.createTravel = async (req, res) => {
   try {
-    // Extract user data from the request body
-    let { tel, nombre_place, heure_depart, compagnie, destination, montant, gare, heure_validation } = req.body;
-
-    // Add "+225" to the beginning of the phone number
-    //tel = "+225" + tel;
+    // Extract data from the request body
+    const { tel, nombre_place, heure_depart, compagnie, destination, montant, gare, heure_validation } = req.body;
 
     // Check if a user with the same phone number already exists
     const existingUser = await User.findOne({ tel });
@@ -846,7 +843,7 @@ exports.createTravel = async (req, res) => {
     if (cinetPayResult.success) {
       // CinetPay payment successful, continue with saving the user and generating JWT token
       const newTravel = new Reservations({
-        tel: tel,
+        tel,
         nombre_place,
         heure_depart,
         compagnie,
@@ -859,6 +856,7 @@ exports.createTravel = async (req, res) => {
         nature,
         datePay: new Date(),
         timePay: new Date().toLocaleTimeString(),
+        tarifTravel: montant, // Assuming 'montant' is the tarifTravel value
       });
 
       // Save the user to the database

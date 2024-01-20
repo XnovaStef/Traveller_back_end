@@ -45,21 +45,12 @@ exports.registerCompany = async (req, res) => {
   try {
     upload(req, res, async (err) => {
       if (err) {
-        console.log(err);
-        return res.status(400).json({ error: err });
+        console.error(err);
+        return res.status(400).json({ error: 'File upload error.' });
       }
 
-      const {
-        compagnie,
-        email,
-        destinationTravel,
-        tarifTravel,
-        gareTravel,
-        destinationColis,
-        TarifColis,
-        gareColis,
-        depart,
-      } = req.body;
+      const { compagnie, email, destinationTravel, depart } = req.body;
+
 
       // Check if a company with the same email already exists
       const existingCompany = await Company.findOne({ email });
@@ -67,68 +58,75 @@ exports.registerCompany = async (req, res) => {
         return res.status(400).json({ error: 'A company with this email already exists.' });
       }
 
-      // Generate a random digit code (temporary password)
-      const digitCode = Math.floor(1000 + Math.random() * 9000).toString();
+      // Generate a secure temporary password
+      const digitCode = generateRandomPassword();
 
       // Send the digit code by email
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: 'falletkamagate3@gmail.com',
-          pass: 'cptt gtct vqnx onys'
-        },
-        tls: {
-          rejectUnauthorized: false,
-        },
+      try {
+        await sendOtpByEmail(email, digitCode);
+      } catch (emailError) {
+        console.error(emailError);
+        return res.status(500).json({ error: 'Failed to send email. Please try again later.' });
+      }
+
+      // If the email is sent successfully, proceed with company registration
+      const hashedPassword = await bcrypt.hash(digitCode, 10);
+      const newCompany = new Company({
+        compagnie,
+        email,
+        password: hashedPassword,
+        destinationTravel: parseDestinations(destinationTravel),
+        depart,
       });
 
-      const mailOptions = {
-        from: 'hello@example.com',
-        to: email,
-        subject: 'Your OTP Code',
-        text: `Your OTP code is: ${digitCode}`,
-      };
-
-      transporter.sendMail(mailOptions, async (emailErr, info) => {
-        if (emailErr) {
-          console.error(emailErr);
-          return res.status(500).json({ error: 'Failed to send email. Please try again later.' });
-        }
-
-        // If the email is sent successfully, proceed with company registration
-        const hashedPassword = await bcrypt.hash(digitCode, 10);
-        const newCompany = new Company({
-          compagnie,
-          email,
-          password: hashedPassword, // Use the generated password
-          destinationTravel,
-          tarifTravel,
-          gareTravel,
-          destinationColis,
-          TarifColis,
-          gareColis,
-         depart,
-          /*logo: {
-            data: fs.readFileSync(path.join(__dirname, "../uploads/" + req.file.filename)),
-            contentType: req.file.mimetype,
-          },*/
-        });
-
-        try {
-          await newCompany.save(); // Use await to save the company
-          res.status(201).json({
-            message: 'Company registered successfully.',
-          });
-        } catch (saveErr) {
-          console.error(saveErr);
-          return res.status(500).json({ error: 'Failed to save company details.' });
-        }
+      await newCompany.save();
+      res.status(201).json({
+        message: 'Company registered successfully.',
       });
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Server Error' });
   }
 };
+
+
+
+function generateRandomPassword() {
+  return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+function sendOtpByEmail(email, digitCode) {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'falletkamagate3@gmail.com',
+      pass: 'cptt gtct vqnx onys',
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+
+  const mailOptions = {
+    from: 'hello@example.com',
+    to: email,
+    subject: 'Your OTP Code',
+    text: `Your OTP code is: ${digitCode}`,
+  };
+
+  return transporter.sendMail(mailOptions);
+}
+
+function parseDestinations(destinations) {
+  return destinations.map((destination) => ({
+    destination: destination.destination,
+    Travel: destination.Travel,
+    Colis: destination.Colis,
+    gare: destination.gare,
+  }));
+}
+
 
 
 exports.countCompany = async (req, res) => {

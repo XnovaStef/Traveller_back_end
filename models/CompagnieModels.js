@@ -14,42 +14,35 @@ const CompanySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  destinationTravel: {
-    type: String,
-    required: true,
-  },
-  tarifTravel: {
-    type: Number,
-    required: true,
-  },
-  gareTravel: {
-    type: String,
-    required: true,
-  },
-  destinationColis: {
-    type: String,
-    required: true,
-  },
-  TarifColis: {
-    type: Number,
-    required: true,
-  },
-  gareColis: {
-    type: String,
-    required: true,
-  },
+  destinationTravel: [
+    {
+      destination: {
+        type: String,
+        required: true,
+      },
+      Travel: {
+        type: Number,
+        required: true,
+      },
+      Colis: {
+        type: Number,
+        required: true,
+      },
+      gare: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
+ 
   depart: {
-    type: String, 
+    type: String,
     required: true,
   },
   dateAdded: {
     type: Date,
     default: Date.now,
   },
-  /*logo: {
-    data: Buffer, // Store the binary photo data
-    contentType: String, // Store the content type of the photo (e.g., image/jpeg, image/png)
-  },*/
 });
 
 CompanySchema.plugin(uniqueValidator);
