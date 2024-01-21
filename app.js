@@ -37,7 +37,10 @@ const rankingCompany = require('./routes/UserRoute');
 const getTravelsByUser = require('./routes/UserRoute');
 const StatsDetail = require('./routes/UserRoute');
 const getStats = require('./routes/UserRoute');
-const afficherDernierCodeEnregistre = require('./routes/UserRoute')
+const afficherDernierCodeEnregistre = require('./routes/UserRoute');
+const  everyTravelInfoCompany = require('./routes/UserRoute');
+const  everyColisInfoCompany = require('./routes/UserRoute');
+const  everyReservationInfoCompany = require('./routes/UserRoute');
 
 // Routes for Company Management
 const registerCompany = require('./routes/CompanyRoutes');
@@ -99,6 +102,9 @@ app.use('/api/user', [
   everyTravelInfo,
   everyColisInfo,
   everyReservationInfo,
+  everyTravelInfoCompany,
+  everyColisInfoCompany,
+  everyReservationInfoCompany,
   countReservation,
   countNotifs,
   everyNotifInfo,
@@ -113,7 +119,7 @@ app.use('/api/user', [
   getTravelsByUser,
   StatsDetail,
   getStats,
-  afficherDernierCodeEnregistre
+  afficherDernierCodeEnregistre,
 ]);
 
 // Company Management

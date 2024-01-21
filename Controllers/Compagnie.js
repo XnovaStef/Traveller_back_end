@@ -197,10 +197,10 @@ exports.getAllDestinationTravel = async (req, res) => {
 exports.loginCompany = async (req, res) => {
   try {
     // Extract email and password from the request body
-    const { email, password } = req.body;
+    const { compagnie, password } = req.body;
 
     // Check if a company with the provided email exists
-    const company = await Company.findOne({ email });
+    const company = await Company.findOne({ compagnie });
 
     if (!company) {
       return res.status(401).json({ message: 'Invalid email or password' });

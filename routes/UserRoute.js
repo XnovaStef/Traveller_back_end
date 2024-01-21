@@ -39,6 +39,9 @@ const {
   everyReservationInfoTelCode,
   everyTravelInfoTelCode,
   everyColisInfoTelCode,
+  everyTravelInfoCompany,
+  everyColisInfoCompany,
+  everyReservationInfoCompany,
 
 } = require('../Controllers/User');
 
@@ -68,6 +71,12 @@ router.get('/everyColisInfoTel/:tel', everyColisInfoTel);
 router.get('/everyColisInfo', everyColisInfo);
 router.get('/everyTravelInfo', everyTravelInfo);
 router.get('/everyReservationInfo', everyReservationInfo);
+
+// DISPLAY TRANSACTION WITH COMPANY NAME
+
+router.get('/everyTravelInfoCompany/:compagnie',  everyTravelInfoCompany);
+router.get('/everyColisInfoCompany/:compagnie',  everyColisInfoCompany);
+router.get('/everyReservationInfoCompany/:compagnie',  everyReservationInfoCompany)
 
 /////////////////////////////////////////////////////////////////
 router.get('/countReservation', countReservation);
